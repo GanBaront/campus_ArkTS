@@ -31,7 +31,7 @@ struct Index {
       this.showWelcomeDialog();
     }
 
-    // 2. 将 Key 严格对齐为课程报告要求的 'theme_mode' 和 'font_size' 字段 [cite: 36, 46]
+    // 2. 将 Key 严格对齐为课程报告要求的 'theme_mode' 和 'font_size' 字段
     const savedTheme = await StorageManager.getInstance().getSetting('theme_mode', 'light');
     AppStorage.set('appTheme', savedTheme);
 
@@ -47,7 +47,7 @@ struct Index {
     this.scheduleList = await StorageManager.getInstance().queryAllSchedules();
   }
 
-  // 首次进入欢迎弹窗 [cite: 25, 41]
+  // 首次进入欢迎弹窗
   showWelcomeDialog() {
     promptAction.showDialog({
       title: '欢迎使用',
@@ -59,19 +59,19 @@ struct Index {
     })
   }
 
-  // 切换主题模式 (KV Store) [cite: 26]
+  // 切换主题模式 (KV Store)
   async toggleTheme() {
     this.appTheme = this.appTheme === 'light' ? 'dark' : 'light';
     await StorageManager.getInstance().putSetting('theme_mode', this.appTheme);
   }
 
-  // 切换字号 (KV Store) [cite: 26]
+  // 切换字号 (KV Store)
   async toggleFontSize() {
     this.appFontSize = this.appFontSize === 16 ? 20 : 16;
     await StorageManager.getInstance().putSetting('font_size', this.appFontSize.toString());
   }
 
-  // 新增日程插入到数据库 (RelationalStore) [cite: 29]
+  // 新增日程插入到数据库 (RelationalStore)
   async addSchedule() {
     if (!this.newTitle.trim()) {
       promptAction.showToast({ message: '请输入日程标题' });
@@ -95,7 +95,7 @@ struct Index {
     await this.refreshSchedules();
   }
 
-  // 从数据库中抹除某条日程 (RelationalStore) [cite: 29]
+  // 从数据库中抹除某条日程 (RelationalStore)
   async deleteSchedule(id: number) {
     await StorageManager.getInstance().deleteScheduleById(id);
     promptAction.showToast({ message: '已从数据库中安全擦除' });
@@ -103,7 +103,7 @@ struct Index {
   }
 
   build() {
-    // 🛠️ 容器层：外层包裹 Column 确保大底座完全统一，拒绝任何系统边框带来的漏光
+    // 🛠️ 确保整体最外层也做穿透，不给状态栏和底部导航栏留任何白色缺口
     Column() {
       Tabs({ barPosition: BarPosition.End, index: this.currentIndex }) {
 
@@ -124,7 +124,7 @@ struct Index {
 
             Scroll() {
               Column({ space: 16 }) {
-                // 偏好设置仓 (KV Store 驱动) [cite: 26]
+                // 偏好设置仓 (KV Store 驱动)
                 Column({ space: 12 }) {
                   Text('偏好设置舱 (KV Store)')
                     .fontSize(this.appFontSize - 3)
@@ -159,7 +159,7 @@ struct Index {
                 .borderRadius(12)
                 .backgroundColor(this.appTheme === 'dark' ? '#2D2D35' : '#FFFFFF')
 
-                // 数据表单录入区 (RelationalStore 写入端) [cite: 29]
+                // 数据表单录入区 (RelationalStore 写入端)
                 Column({ space: 10 }) {
                   Text('新建日程数据 (RelationalStore 写入)')
                     .fontSize(this.appFontSize - 3)
@@ -191,7 +191,7 @@ struct Index {
                 .borderRadius(12)
                 .backgroundColor(this.appTheme === 'dark' ? '#2D2D35' : '#FFFFFF')
 
-                // 数据视图呈现展示区 [cite: 36]
+                // 数据视图呈现展示区
                 Column({ space: 8 }) {
                   Text(`动态数据沙箱队列 (共 ${this.scheduleList.length} 条)`)
                     .fontSize(this.appFontSize - 3)
@@ -263,17 +263,26 @@ struct Index {
         }
         .tabBar(this.TabBuilder('工作台', 0))
 
-        // ===== TAB 2, 3, 4: 实验分区占位 =====
+        // ===== TAB 2: 学习（占位，可导入你的学生管理页面） =====
         TabContent() {
-          Column().width('100%').height('100%').backgroundColor(this.appTheme === 'dark' ? '#121216' : '#F3F4F6')
+          Column() {
+            Text('学习中心')
+              .fontSize(this.appFontSize + 4)
+              .fontColor(this.appTheme === 'dark' ? '#FFF' : '#333')
+          }
+          .width('100%').height('100%')
+          .justifyContent(FlexAlign.Center)
+          .backgroundColor(this.appTheme === 'dark' ? '#121216' : '#F3F4F6')
         }.tabBar(this.TabBuilder('学习', 1))
 
+        // ===== TAB 3: 🛠️ 扩充复刻的【互动社区】页面 =====
         TabContent() {
-          Column().width('100%').height('100%').backgroundColor(this.appTheme === 'dark' ? '#121216' : '#F3F4F6')
+          InteractionView()
         }.tabBar(this.TabBuilder('互动', 2))
 
+        // ===== TAB 4: 🛠️ 扩充复刻的【校园集市】页面 =====
         TabContent() {
-          Column().width('100%').height('100%').backgroundColor(this.appTheme === 'dark' ? '#121216' : '#F3F4F6')
+          MarketView()
         }.tabBar(this.TabBuilder('集市', 3))
 
         // ===== TAB 5: 完美对接个人中心 =====
@@ -287,34 +296,299 @@ struct Index {
       })
       .width('100%')
       .layoutWeight(1)
-      .scrollable(false) // 🛠️ 优化 1：关闭手势滑动交互，防止把底色顶坏
-      .barHeight(60)     // 🛠️ 优化 2：小幅拉高导航栏，适配全面屏安全高度
-      .barBackgroundColor(this.appTheme === 'dark' ? '#1E1E24' : Color.White) // 🛠️ 状态栏容器底色
-      // 🛠️ 优化 3：重磅配置！强制下沉渲染，使 Tab 的背景直接蔓延吞掉系统虚拟按键的白底
+      .scrollable(false) // 关闭手势滑动，确保大底色渲染连贯
+      .barHeight(64)     // 适配底部避让安全高度
+      .barBackgroundColor(this.appTheme === 'dark' ? '#1E1E24' : Color.White)
+      // 🛠️ 穿透核心：向下延伸吞掉底栏系统白边
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(this.appTheme === 'dark' ? '#1E1E24' : Color.White) // 🛠️ 外部大底座全屏对齐
+    // 🛠️ 极致细节：将外层大背景渲染层与当前主题完全打通
+    .backgroundColor(this.appTheme === 'dark' ? '#1E1E24' : Color.White)
   }
 
-  // 状态栏组件构造器
+  // 状态栏 Tab 统一构造器
   @Builder TabBuilder(title: string, targetIndex: number) {
     Column() {
+      // 纯自绘精美滑块图标（激活时蓝色，非激活时灰度，完美规避图片丢失报错）
       Column()
         .width(22)
         .height(22)
         .backgroundColor(this.currentIndex === targetIndex ? '#2F6BFA' : (this.appTheme === 'dark' ? '#555566' : '#9CA3AF'))
-        .borderRadius(5)
+        .borderRadius(6)
         .margin({ bottom: 4 })
 
       Text(title)
-        .fontSize(this.appFontSize - 4)
+        .fontSize(this.appFontSize - 4) // 状态栏字号完美跟随偏好滑块动态放大
         .fontColor(this.currentIndex === targetIndex ? '#2F6BFA' : (this.appTheme === 'dark' ? '#888888' : '#666666'))
     }
     .width('100%')
     .height('100%')
     .justifyContent(FlexAlign.Center)
     .backgroundColor(this.appTheme === 'dark' ? '#1E1E24' : Color.White)
+  }
+}
+
+
+// ==========================================
+// 🛠️ 子页面 1: 完美复刻的【互动社区】组件
+// ==========================================
+@Component
+struct InteractionView {
+  @StorageLink('appTheme') appTheme: string = 'light';
+  @StorageLink('appFontSize') appFontSize: number = 16;
+  @State activeSubTab: number = 0;
+
+  build() {
+    Column() {
+      // 1. 顶部操作栏
+      Row() {
+        Text('互动社区')
+          .fontSize(this.appFontSize + 4)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1F2937')
+        Blank()
+        // 模拟右侧搜索与发布图标
+        Row({ space: 16 }) {
+          Circle({ width: 20, height: 20 }).fill(this.appTheme === 'dark' ? '#555566' : '#E5E7EB')
+          Rect({ width: 20, height: 20 }).radius(4).fill('#2F6BFA')
+        }
+      }
+      .width('100%').padding(16)
+
+      // 2. 社区分类子 Tab 栏
+      Row({ space: 24 }) {
+        this.SubTabItem('推荐', 0)
+        this.SubTabItem('组队', 1)
+        this.SubTabItem('匿名树洞', 2)
+        this.SubTabItem('黑板报', 3)
+      }
+      .width('100%').padding({ left: 16, right: 16, bottom: 8 })
+
+      // 3. 内容滚动沙盒
+      Scroll() {
+        Column({ space: 14 }) {
+          // 热门话题热门 Tags
+          Row({ space: 8 }) {
+            this.TopicTag('# 2026毕业设计课题 #')
+            this.TopicTag('# 食堂新品采样 #')
+          }.width('100%').padding({ left: 4 })
+
+          // 复刻贴 1：带精致高亮预约卡片的通知贴
+          Column({ space: 10 }) {
+            Row({ space: 10 }) {
+              Circle({ width: 36, height: 36 }).fill('#F59E0B')
+              Column({ space: 2 }) {
+                Text('智能机器人协会_小甘').fontSize(this.appFontSize - 2).fontWeight(FontWeight.Bold)
+                  .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1F2937')
+                Text('来自官方社团认证').fontSize(11).fontColor('#9CA3AF')
+              }.alignItems(HorizontalAlign.Start)
+            }.width('100%')
+
+            Text('下周三下午在信教302有无人机全自主飞行演示活动！欢迎各位对低空经济和软硬件控制感兴趣的同学到场交流，点击下方卡片即可抢先预约。')
+              .fontSize(this.appFontSize - 1)
+              .lineHeight(22)
+              .fontColor(this.appTheme === 'dark' ? '#E5E7EB' : '#374151')
+
+            // 复刻图中的蓝色内置预约活动卡片
+            Row() {
+              Column() {
+                Text('JUN').fontSize(10).fontColor('#FFFFFF').fontWeight(FontWeight.Bold)
+                Text('17').fontSize(18).fontColor('#FFFFFF').fontWeight(FontWeight.Bold)
+              }
+              .backgroundColor('#2F6BFA').padding({ left: 10, right: 10, top: 6, bottom: 6 }).borderRadius(8)
+              .margin({ right: 12 })
+
+              Column({ space: 2 }) {
+                Text('无人机真机仿真控制讲座').fontSize(this.appFontSize - 2).fontWeight(FontWeight.Bold).fontColor('#FFFFFF')
+                Text('已有 48 人预约 / 限额 60 人').fontSize(11).fontColor('#BFDBFE')
+              }.alignItems(HorizontalAlign.Start).layoutWeight(1)
+
+              Button('预约').fontSize(12).height(28).width(56).backgroundColor('#FFFFFF').fontColor('#2F6BFA')
+            }
+            .backgroundColor('#2F6BFA')
+            .padding(12)
+            .borderRadius(12)
+            .width('100%')
+
+            this.PostActionBar('125', '32')
+          }
+          .padding(14).borderRadius(16)
+          .backgroundColor(this.appTheme === 'dark' ? '#1E1E24' : '#FFFFFF')
+
+          // 复刻贴 2：普通文本吐槽吐槽贴
+          Column({ space: 10 }) {
+            Row({ space: 10 }) {
+              Circle({ width: 36, height: 36 }).fill('#9CA3AF')
+              Text('某不愿透露姓名的同学').fontSize(this.appFontSize - 2).fontWeight(FontWeight.Bold)
+                .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1F2937')
+            }.width('100%')
+
+            Text('图书馆四楼某些自习室的空调机位声音也太响了，一坐下嗡嗡嗡的根本看不进去代码，希望能有物业老师管管呀。')
+              .fontSize(this.appFontSize - 1)
+              .lineHeight(22)
+              .fontColor(this.appTheme === 'dark' ? '#E5E7EB' : '#374151')
+
+            this.PostActionBar('56', '12')
+          }
+          .padding(14).borderRadius(16)
+          .backgroundColor(this.appTheme === 'dark' ? '#1E1E24' : '#FFFFFF')
+        }
+        .padding(12)
+      }.layoutWeight(1)
+    }
+    .width('100%').height('100%')
+    .backgroundColor(this.appTheme === 'dark' ? '#121216' : '#F3F4F6')
+  }
+
+  @Builder SubTabItem(name: string, id: number) {
+    Column({ space: 4 }) {
+      Text(name)
+        .fontSize(this.activeSubTab === id ? this.appFontSize + 1 : this.appFontSize - 1)
+        .fontWeight(this.activeSubTab === id ? FontWeight.Bold : FontWeight.Normal)
+        .fontColor(this.activeSubTab === id ? '#2F6BFA' : '#9CA3AF')
+      if (this.activeSubTab === id) {
+        Rect().width(16).height(3).fill('#2F6BFA').borderRadius(2)
+      }
+    }.onClick(() => this.activeSubTab = id)
+  }
+
+  @Builder TopicTag(text: string) {
+    Text(text)
+      .fontSize(this.appFontSize - 4)
+      .fontColor('#2F6BFA')
+      .backgroundColor(this.appTheme === 'dark' ? '#242430' : '#EBF2FF')
+      .padding({ left: 10, right: 10, top: 5, bottom: 5 })
+      .borderRadius(12)
+  }
+
+  @Builder PostActionBar(likes: string, comments: string) {
+    Row() {
+      Row({ space: 4 }) {
+        Circle({ width: 14, height: 14 }).fill('#9CA3AF')
+        Text(likes).fontSize(12).fontColor('#9CA3AF')
+      }.margin({ right: 20 })
+      Row({ space: 4 }) {
+        Rect({ width: 14, height: 14 }).radius(2).fill('#9CA3AF')
+        Text(comments).fontSize(12).fontColor('#9CA3AF')
+      }
+    }.width('100%').margin({ top: 6 })
+  }
+}
+
+
+// ==========================================
+// 🛠️ 子页面 2: 完美复刻的【校园集市】组件（双列布局）
+// ==========================================
+@Component
+struct MarketView {
+  @StorageLink('appTheme') appTheme: string = 'light';
+  @StorageLink('appFontSize') appFontSize: number = 16;
+  @State activeCat: number = 0;
+
+  build() {
+    Column() {
+      // 1. 顶部操作头
+      Row() {
+        Text('校园集市')
+          .fontSize(this.appFontSize + 4)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1F2937')
+        Blank()
+        // 右侧购物车加发布快连
+        Row({ space: 16 }) {
+          Circle({ width: 22, height: 22 }).fill('#10B981')
+          Circle({ width: 22, height: 22 }).fill('#2F6BFA')
+        }
+      }
+      .width('100%').padding(16)
+
+      // 2. 搜索过滤舱条
+      Row() {
+        Row({ space: 8 }) {
+          Circle({ width: 14, height: 14 }).fill('#9CA3AF')
+          Text('搜索闲置宝贝、考研资料...').fontSize(13).fontColor('#9CA3AF')
+        }
+        .layoutWeight(1)
+        .padding(10)
+        .borderRadius(10)
+        .backgroundColor(this.appTheme === 'dark' ? '#2D2D35' : '#E5E7EB')
+
+        Text('筛选').fontSize(14).fontColor('#2F6BFA').margin({ left: 12 })
+      }
+      .width('100%').padding({ left: 16, right: 16, bottom: 12 })
+
+      // 3. 瀑布流双列网格卡片区
+      Scroll() {
+        // 使用高效的纵向双列混排
+        Row({ space: 12 }) {
+          // 左列
+          Column({ space: 12 }) {
+            this.MarketProductCard('iPad Air4 64G 考研神器 附带全套无源电容笔 顺滑无延迟', '2450', '3800', '毕业学姐')
+            this.MarketProductCard('人体工学转椅 气压杆安全 靠背可调', '80', '199', '宿管寄售')
+          }.layoutWeight(1)
+
+          // 右列
+          Column({ space: 12 }) {
+            this.MarketProductCard('高等数学第七版 下册 九成新 无笔记', '15', '45', '大二学霸')
+            this.MarketProductCard('入门级古典吉他 琴弦已换新 赠拨片', '120', '', '吉他社闲置')
+          }.layoutWeight(1)
+        }
+        .width('100%')
+        .padding(12)
+        .alignItems(VerticalAlign.Top)
+      }.layoutWeight(1)
+    }
+    .width('100%').height('100%')
+    .backgroundColor(this.appTheme === 'dark' ? '#121216' : '#F3F4F6')
+  }
+
+  @Builder MarketProductCard(title: string, price: string, originalPrice: string, sellerTag: string) {
+    Column() {
+      // 占位图自绘色块（如果是真实项目可在此处放 Image）
+      Column()
+        .width('100%')
+        .height(110)
+        .backgroundColor(this.appTheme === 'dark' ? '#3E3E4A' : '#E5E7EB')
+        .borderRadius({ topLeft: 12, topRight: 12 })
+
+      Column({ space: 6 }) {
+        // 商品名称（多行截断展示）
+        Text(title)
+          .fontSize(this.appFontSize - 2)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(this.appTheme === 'dark' ? '#E5E7EB' : '#1F2937')
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+        // 价格双显示（现价红，原价划线灰）
+        Row({ space: 6 }) {
+          Text(`￥${price}`)
+            .fontSize(this.appFontSize - 1)
+            .fontWeight(FontWeight.Bold)
+            .fontColor('#EF4444')
+
+          if (originalPrice) {
+            Text(`￥${originalPrice}`)
+              .fontSize(11)
+              .fontColor('#9CA3AF')
+              .decoration({ type: TextDecorationType.LineThrough })
+          }
+        }.width('100%')
+
+        // 卖家身份标签
+        Row({ space: 4 }) {
+          Circle({ width: 5, height: 5 }).fill('#10B981')
+          Text(sellerTag).fontSize(10).fontColor('#9CA3AF')
+        }
+      }
+      .padding(10)
+      .alignItems(HorizontalAlign.Start)
+    }
+    .width('100%')
+    .borderRadius(12)
+    .backgroundColor(this.appTheme === 'dark' ? '#1E1E24' : '#FFFFFF')
+    .shadow({ radius: 4, color: '#08000000', offsetY: 1 })
   }
 }
