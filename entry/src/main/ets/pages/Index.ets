@@ -33,10 +33,10 @@ struct Index {
 
     // 2. 将 Key 严格对齐为课程报告要求的 'theme_mode' 和 'font_size' 字段 [cite: 36, 46]
     const savedTheme = await StorageManager.getInstance().getSetting('theme_mode', 'light');
-    AppStorage.setOrCreate('appTheme', savedTheme);
+    AppStorage.set('appTheme', savedTheme);
 
     const savedFontSize = await StorageManager.getInstance().getSetting('font_size', '16');
-    AppStorage.setOrCreate('appFontSize', Number(savedFontSize));
+    AppStorage.set('appFontSize', Number(savedFontSize));
 
     // 3. 从 RelationalStore 读取数据库离线日程单列表
     await this.refreshSchedules();

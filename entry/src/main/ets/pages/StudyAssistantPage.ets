@@ -46,6 +46,10 @@ interface ActionButtonItem {
 export struct StudyAssistantView {
   @State currentSubTab: number = 0
 
+  // 响应全局主题与字号
+  @StorageProp('appTheme') appTheme: string = 'light'
+  @StorageProp('appFontSize') appFontSize: number = 16
+
   build() {
     Column() {
       // 顶部极简 Tab 导航栏
@@ -57,7 +61,7 @@ export struct StudyAssistantView {
       }
       .width('100%')
       .height(48)
-      .backgroundColor(Color.White)
+      .backgroundColor(this.appTheme === 'dark' ? '#1E1E1E' : Color.White)
       .padding({ left: 16, right: 16 })
 
       // 分流内容区
@@ -77,15 +81,15 @@ export struct StudyAssistantView {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor('#F7F8FA')
+    .backgroundColor(this.appTheme === 'dark' ? '#121212' : '#F7F8FA')
   }
 
   @Builder TopNavBarItem(title: string, index: number) {
     Column() {
       Text(title)
-        .fontSize(16)
+        .fontSize(this.appFontSize)
         .fontWeight(this.currentSubTab === index ? FontWeight.Bold : FontWeight.Medium)
-        .fontColor(this.currentSubTab === index ? '#1C1B1F' : '#9CA3AF')
+        .fontColor(this.currentSubTab === index ? (this.appTheme === 'dark' ? '#FFFFFF' : '#1C1B1F') : '#9CA3AF')
         .margin({ bottom: 6 })
 
       Rect()
@@ -109,6 +113,10 @@ struct CourseScheduleTimelineModule {
   @State currentWeek: number = 1
   @State selectedDayOfWeek: number = 1
   @State isWeekView: boolean = false
+
+  // 响应全局主题与字号
+  @StorageProp('appTheme') appTheme: string = 'light'
+  @StorageProp('appFontSize') appFontSize: number = 16
 
   // 严格限定初始课表只绑定到【第一周】+【星期一】
   @State coursesList: CourseItem[] = [
@@ -315,8 +323,8 @@ struct CourseScheduleTimelineModule {
           Select(this.weekSelectOptions)
             .selected(this.currentWeek - 1)
             .value(`第 ${this.currentWeek} 周 (${this.currentWeek % 2 === 1 ? '单周' : '双周'})`)
-            .font({ size: 16, weight: FontWeight.Bold })
-            .fontColor('#1F2937')
+            .font({ size: this.appFontSize, weight: FontWeight.Bold })
+            .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1F2937')
             .onSelect((index: number) => {
               this.currentWeek = index + 1
             })
@@ -349,9 +357,9 @@ struct CourseScheduleTimelineModule {
                     Circle().width(28).height(28).fill('#2F6BFA')
                   }
                   Text(dayItem.dayNum)
-                    .fontSize(14)
+                    .fontSize(this.appFontSize - 2)
                     .fontWeight(FontWeight.Bold)
-                    .fontColor(this.selectedDayOfWeek === dayItem.dayValue ? Color.White : '#1F2937')
+                    .fontColor(this.selectedDayOfWeek === dayItem.dayValue ? Color.White : (this.appTheme === 'dark' ? '#CCCCCC' : '#1F2937'))
                 }
               }
               .layoutWeight(1)
@@ -360,7 +368,7 @@ struct CourseScheduleTimelineModule {
           }
           .width('100%')
           .padding({ top: 12, bottom: 12, left: 10, right: 10 })
-          .backgroundColor(Color.White)
+          .backgroundColor(this.appTheme === 'dark' ? '#1E1E1E' : Color.White)
           .margin({ bottom: 12 })
 
           Scroll() {
@@ -385,16 +393,16 @@ struct CourseScheduleTimelineModule {
 
               ForEach(['一', '二', '三', '四', '五', '六', '日'], (weekName: string) => {
                 Text(`周${weekName}`)
-                  .fontSize(11)
+                  .fontSize(this.appFontSize - 5)
                   .fontWeight(FontWeight.Bold)
-                  .fontColor('#4B5563')
+                  .fontColor(this.appTheme === 'dark' ? '#CCCCCC' : '#4B5563')
                   .textAlign(TextAlign.Center)
                   .layoutWeight(1)
               }, (weekName: string) => weekName)
             }
             .width('100%')
             .height(32)
-            .backgroundColor('#EBF2FF')
+            .backgroundColor(this.appTheme === 'dark' ? '#1E2A3A' : '#EBF2FF')
             .borderRadius({ topLeft: 8, topRight: 8 })
 
             Row() {
@@ -402,22 +410,22 @@ struct CourseScheduleTimelineModule {
                 ForEach(this.timeSlots, (slotNum: number) => {
                   Column({ space: 2 }) {
                     Text(`${slotNum}`)
-                      .fontSize(13)
+                      .fontSize(this.appFontSize - 3)
                       .fontWeight(FontWeight.Bold)
-                      .fontColor('#1F2937')
+                      .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1F2937')
                     Text(slotNum === 1 ? '08:00' : slotNum === 2 ? '10:00' : slotNum === 3 ? '12:00' : slotNum === 4 ? '14:00' : '16:00')
-                      .fontSize(9)
+                      .fontSize(this.appFontSize - 7)
                       .fontColor('#9CA3AF')
                   }
                   .width('100%')
                   .height(76)
                   .justifyContent(FlexAlign.Center)
-                  .border({ width: { bottom: 1 }, color: '#F3F4F6' })
+                  .border({ width: { bottom: 1 }, color: this.appTheme === 'dark' ? '#2C2C2C' : '#F3F4F6' })
                 }, (slotNum: number) => slotNum.toString())
               }
               .width('12%')
               .height('100%')
-              .backgroundColor('#FAFAFA')
+              .backgroundColor(this.appTheme === 'dark' ? '#1A1A1A' : '#FAFAFA')
 
               // 右侧主格：高频率刷新机制绑定
               Grid() {
@@ -438,7 +446,7 @@ struct CourseScheduleTimelineModule {
           .width('96%')
           .layoutWeight(1)
           .margin({ top: 4, bottom: 8 })
-          .backgroundColor(Color.White)
+          .backgroundColor(this.appTheme === 'dark' ? '#1E1E1E' : Color.White)
           .borderRadius(8)
           .shadow({ radius: 6, color: '#08000000' })
         }
@@ -514,7 +522,7 @@ struct CourseScheduleTimelineModule {
     .height(76)
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Center)
-    .border({ width: { right: 1, bottom: 1 }, color: '#F3F4F6' })
+    .border({ width: { right: 1, bottom: 1 }, color: this.appTheme === 'dark' ? '#2C2C2C' : '#F3F4F6' })
   }
 
   @Builder RenderTimeLineRow(course: CourseItem) {
@@ -564,13 +572,13 @@ struct CourseScheduleTimelineModule {
           Row() {
             Column({ space: 5 }) {
               Text(course.name)
-                .fontSize(16)
+                .fontSize(this.appFontSize)
                 .fontWeight(FontWeight.Bold)
-                .fontColor('#1F2937')
+                .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1F2937')
 
               Text(`${course.teacher} | ${course.location} [${course.credit}学分]`)
-                .fontSize(12)
-                .fontColor('#6B7280')
+                .fontSize(this.appFontSize - 4)
+                .fontColor(this.appTheme === 'dark' ? '#AAAAAA' : '#6B7280')
 
               Text(course.weekType === '特定周' ? `排课周期: 第 ${course.specificWeek} 周` : `排课周期: ${course.weekType}`)
                 .fontSize(10)
@@ -609,18 +617,20 @@ struct CourseScheduleTimelineModule {
       Column({ space: 4 }) {
         Row({ space: 6 }) {
           Image($r('app.media.room')).width(16).height(16)
-          Text('空教室快速查询').fontSize(14).fontWeight(FontWeight.Bold).fontColor('#1F2937')
+          Text('空教室快速查询').fontSize(this.appFontSize - 2).fontWeight(FontWeight.Bold)
+            .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1F2937')
         }
-        Text('公共教学楼: 12 间 | 信息教学楼: 04 间').fontSize(12).fontColor('#6B7280')
+        Text('公共教学楼: 12 间 | 信息教学楼: 04 间').fontSize(this.appFontSize - 4)
+          .fontColor(this.appTheme === 'dark' ? '#AAAAAA' : '#6B7280')
       }.alignItems(HorizontalAlign.Start).layoutWeight(1)
 
-      Text('实时更新').fontSize(11).fontColor('#6B7280').backgroundColor('#E5E7EB')
+      Text('实时更新').fontSize(this.appFontSize - 5).fontColor('#6B7280').backgroundColor('#E5E7EB')
         .padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(6)
     }
     .width('100%')
     .padding(14)
     .margin({ top: 16, bottom: 34 })
-    .backgroundColor(Color.White)
+    .backgroundColor(this.appTheme === 'dark' ? '#1E1E1E' : Color.White)
     .borderRadius(14)
     .shadow({ radius: 6, color: '#06000000', offsetY: 2 })
   }
@@ -635,7 +645,8 @@ struct CourseScheduleTimelineModule {
 
       Column({ space: 14 }) {
         Text(this.isEditingMode ? '完善调整日程数据' : '自填手动排课入库')
-          .fontSize(16).fontWeight(FontWeight.Bold).fontColor('#1F2937')
+          .fontSize(this.appFontSize).fontWeight(FontWeight.Bold)
+          .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1F2937')
 
         TextInput({ text: this.formName, placeholder: '请输入课程名称（必填）' })
           .height(42).onChange(v => { this.formName = v })
@@ -650,25 +661,25 @@ struct CourseScheduleTimelineModule {
           .type(InputType.Number).height(42).onChange(v => { this.formCredit = v })
 
         Row() {
-          Text('上课星期:').fontSize(14).fontColor('#4B5563')
+          Text('上课星期:').fontSize(this.appFontSize - 2).fontColor('#4B5563')
           Counter() {
-            Text(`周 ${['一','二','三','四','五','六','日'][this.formDayOfWeek - 1]}`).fontSize(13).fontWeight(FontWeight.Bold)
+            Text(`周 ${['一','二','三','四','五','六','日'][this.formDayOfWeek - 1]}`).fontSize(this.appFontSize - 3).fontWeight(FontWeight.Bold)
           }
           .onInc(() => { if (this.formDayOfWeek < 7) this.formDayOfWeek++ })
           .onDec(() => { if (this.formDayOfWeek > 1) this.formDayOfWeek-- })
         }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 
         Row() {
-          Text('时段节次:').fontSize(14).fontColor('#4B5563')
+          Text('时段节次:').fontSize(this.appFontSize - 2).fontColor('#4B5563')
           Counter() {
-            Text(`时段 ${this.formSectionStart}`).fontSize(13).fontWeight(FontWeight.Bold)
+            Text(`时段 ${this.formSectionStart}`).fontSize(this.appFontSize - 3).fontWeight(FontWeight.Bold)
           }
           .onInc(() => { if (this.formSectionStart < 5) this.formSectionStart++ })
           .onDec(() => { if (this.formSectionStart > 1) this.formSectionStart-- })
         }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 
         Column({ space: 8 }) {
-          Text('排课周次选择:').fontSize(14).fontColor('#4B5563').width('100%')
+          Text('排课周次选择:').fontSize(this.appFontSize - 2).fontColor('#4B5563').width('100%')
 
           Row({ space: 10 }) {
             Select([{ value: '每周' }, { value: '单周' }, { value: '双周' }, { value: '特定周' }])
@@ -762,7 +773,8 @@ struct CourseScheduleTimelineModule {
             })
         }.margin({ top: 10 })
       }
-      .width('88%').padding(20).backgroundColor(Color.White).borderRadius(16)
+      .width('88%').padding(20)
+      .backgroundColor(this.appTheme === 'dark' ? '#1E1E1E' : Color.White).borderRadius(16)
     }
     .width('100%').height('100%')
   }
@@ -779,6 +791,10 @@ struct ScoreQueryModule {
     { name: '创业管理学', score: 95, gpa: 4.5, examTime: '2026-01-15' }
   ]
 
+  // 响应全局主题与字号
+  @StorageProp('appTheme') appTheme: string = 'light'
+  @StorageProp('appFontSize') appFontSize: number = 16
+
   build() {
     Column() {
       List() {
@@ -786,13 +802,17 @@ struct ScoreQueryModule {
           ListItem() {
             Row() {
               Column({ space: 4 }) {
-                Text(score.name).fontSize(15).fontWeight(FontWeight.Bold).fontColor('#1F2937')
-                Text(`绩点: ${score.gpa} | 评定时间: ${score.examTime}`).fontSize(12).fontColor('#9CA3AF')
+                Text(score.name).fontSize(this.appFontSize - 1).fontWeight(FontWeight.Bold)
+                  .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1F2937')
+                Text(`绩点: ${score.gpa} | 评定时间: ${score.examTime}`).fontSize(this.appFontSize - 4)
+                  .fontColor('#9CA3AF')
               }.alignItems(HorizontalAlign.Start)
               Blank()
-              Text(`${score.score}`).fontSize(20).fontColor('#2F6BFA').fontWeight(FontWeight.Bold)
+              Text(`${score.score}`).fontSize(this.appFontSize + 4).fontColor('#2F6BFA').fontWeight(FontWeight.Bold)
             }
-            .width('100%').padding(16).backgroundColor(Color.White).borderRadius(14).margin({ bottom: 10 })
+            .width('100%').padding(16)
+            .backgroundColor(this.appTheme === 'dark' ? '#1E1E1E' : Color.White)
+            .borderRadius(14).margin({ bottom: 10 })
           }
         }, (score: ScoreItem) => score.name)
       }.width('92%').margin({ top: 12 })
@@ -807,9 +827,14 @@ struct ScoreQueryModule {
 struct PlaceholderModule {
   private title: string = '内容加载中...'
 
+  // 响应全局主题与字号
+  @StorageProp('appTheme') appTheme: string = 'light'
+  @StorageProp('appFontSize') appFontSize: number = 16
+
   build() {
     Column() {
-      Text(this.title).fontSize(13).fontColor('#9CA3AF')
+      Text(this.title).fontSize(this.appFontSize - 3).fontColor('#9CA3AF')
     }.width('100%').height('100%').justifyContent(FlexAlign.Center)
+    .backgroundColor(this.appTheme === 'dark' ? '#121212' : Color.Transparent)
   }
 }

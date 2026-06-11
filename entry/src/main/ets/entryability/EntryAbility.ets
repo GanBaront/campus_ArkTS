@@ -9,7 +9,7 @@ export default class EntryAbility extends UIAbility {
   // 2. 将 onCreate 改为 async 异步函数，确保初始化完成后再向下执行
   async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
     try {
-      this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
+      this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
     } catch (err) {
       hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));
     }

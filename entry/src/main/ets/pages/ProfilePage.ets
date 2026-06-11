@@ -21,10 +21,10 @@ export struct ProfilePage {
   async aboutToAppear() {
     try {
       const savedTheme = await this.storage.getSetting('theme_mode', 'light');
-      AppStorage.setOrCreate('appTheme', savedTheme);
+      AppStorage.set('appTheme', savedTheme);
 
       const savedFontSize = await this.storage.getSetting('font_size', '16');
-      AppStorage.setOrCreate('appFontSize', Number(savedFontSize));
+      AppStorage.set('appFontSize', Number(savedFontSize));
     } catch (e) {
       console.error('读取 KV Store 偏好设置失败: ' + JSON.stringify(e));
     }

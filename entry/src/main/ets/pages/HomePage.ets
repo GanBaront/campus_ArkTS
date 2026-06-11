@@ -23,8 +23,12 @@ struct MainEntry {
   // 提供路由栈给所有子组件，支持 Navigation 内部导航
   @Provide('pageStack') pageStack: NavPathStack = new NavPathStack()
 
+  // 响应全局深浅色主题与字号
+  @StorageLink('appTheme') appTheme: string = 'light'
+  @StorageLink('appFontSize') appFontSize: number = 16
+
   /**
-   * 自定义底部 Tab 构建器
+   * 自定义底部 Tab 构建器（主题响应式）
    */
   @Builder TabBuilder(title: string, index: number, icon: Resource) {
     Column() {
@@ -32,15 +36,16 @@ struct MainEntry {
         .width(24)
         .height(24)
         .margin({ bottom: 4 })
-        .fillColor(this.currentIndex === index ? '#005DFF' : '#999')
+        .fillColor(this.currentIndex === index ? '#005DFF' : (this.appTheme === 'dark' ? '#888888' : '#999'))
         .objectFit(ImageFit.Contain)
       Text(title)
-        .fontSize(10)
-        .fontColor(this.currentIndex === index ? '#005DFF' : '#999')
+        .fontSize(this.appFontSize - 6)
+        .fontColor(this.currentIndex === index ? '#005DFF' : (this.appTheme === 'dark' ? '#888888' : '#999'))
     }
     .width('100%')
     .height(56)
     .justifyContent(FlexAlign.Center)
+    .backgroundColor(this.appTheme === 'dark' ? '#1E1E1E' : Color.White)
   }
 
   build() {
@@ -78,12 +83,14 @@ struct MainEntry {
         .width('100%')
         .height('100%')
         .barHeight(60)
+        .barBackgroundColor(this.appTheme === 'dark' ? '#1E1E1E' : Color.White)
         .onChange((index: number) => {
           this.currentIndex = index
         })
       }
       .width('100%')
       .height('100%')
+      .backgroundColor(this.appTheme === 'dark' ? '#121212' : '#F7F8FA')
     }
     .hideTitleBar(true)
     .mode(NavigationMode.Stack)
@@ -92,9 +99,10 @@ struct MainEntry {
   @Builder PlaceholderView(text: string) {
     Column() {
       Image($r('app.media.more')).width(64).height(64).opacity(0.1).margin({ bottom: 10 })
-      Text(text).fontSize(16).fontColor('#CCC')
+      Text(text).fontSize(this.appFontSize).fontColor(this.appTheme === 'dark' ? '#666666' : '#CCC')
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Center)
+    .backgroundColor(this.appTheme === 'dark' ? '#121212' : Color.White)
   }
 }
 
@@ -108,6 +116,10 @@ struct HomePageView {
   // 消费来自 MainAbility 或 StartAbility 的全局状态
   @StorageProp('userName') userName: string = '甘同学';
   @StorageProp('userId') userId: string = '2301130077';
+
+  // 响应全局主题与字号
+  @StorageProp('appTheme') appTheme: string = 'light';
+  @StorageProp('appFontSize') appFontSize: number = 16;
 
   // 动态日期显示状态
   @State currentDayString: string = ''
@@ -149,9 +161,10 @@ struct HomePageView {
         // 1. 顶部状态栏与用户信息
         Row() {
           Column() {
-            Text(this.currentDayString).fontSize(14).fontColor('#999')
+            Text(this.currentDayString).fontSize(this.appFontSize - 2).fontColor(this.appTheme === 'dark' ? '#888888' : '#999')
             Text(`你好，${this.userName}`)
-              .fontSize(24).fontWeight(FontWeight.Bold).margin({ top: 6 })
+              .fontSize(this.appFontSize + 8).fontWeight(FontWeight.Bold).margin({ top: 6 })
+              .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1A1A1A')
           }.alignItems(HorizontalAlign.Start)
 
           Blank()
@@ -180,7 +193,9 @@ struct HomePageView {
 
         // 2. 校园搜索
         Search({ placeholder: '搜索课程、讲座或校园动态...' })
-          .width('92%').height(46).backgroundColor('#F2F2F2').margin({ bottom: 20 })
+          .width('92%').height(46)
+          .backgroundColor(this.appTheme === 'dark' ? '#2C2C2C' : '#F2F2F2')
+          .margin({ bottom: 20 })
 
         // 3. 动态 Banner
         Stack({ alignContent: Alignment.BottomStart }) {
@@ -188,8 +203,8 @@ struct HomePageView {
             .width('100%').height(180).borderRadius(12).objectFit(ImageFit.Cover)
 
           Column() {
-            Text('2026春季学术周启幕').fontSize(18).fontWeight(FontWeight.Bold).fontColor(Color.White)
-            Text('前沿科技讲座预约已开启').fontSize(12).fontColor(Color.White).margin({ top: 4 })
+            Text('2026春季学术周启幕').fontSize(this.appFontSize + 2).fontWeight(FontWeight.Bold).fontColor(Color.White)
+            Text('前沿科技讲座预约已开启').fontSize(this.appFontSize - 4).fontColor(Color.White).margin({ top: 4 })
           }
           .width('100%').alignItems(HorizontalAlign.Start).padding(15)
           .backgroundBlurStyle(BlurStyle.Thin).borderRadius({ bottomLeft: 12, bottomRight: 12 })
@@ -205,7 +220,7 @@ struct HomePageView {
                   Rect({ width: 54, height: 54 }).fill(item.color).radius(12)
                   Image(item.icon).width(28).height(28).objectFit(ImageFit.Contain)
                 }
-                Text(item.name).fontSize(13).fontColor('#333')
+                Text(item.name).fontSize(this.appFontSize - 3).fontColor(this.appTheme === 'dark' ? '#CCCCCC' : '#333')
               }
             }
           })
@@ -217,9 +232,10 @@ struct HomePageView {
         // 5. 今日课表卡片
         Column() {
           Row() {
-            Text('今日课程 (2)').fontSize(18).fontWeight(FontWeight.Bold)
+            Text('今日课程 (2)').fontSize(this.appFontSize + 2).fontWeight(FontWeight.Bold)
+              .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1A1A1A')
             Blank()
-            Text('完整课表 >').fontSize(13).fontColor('#005DFF')
+            Text('完整课表 >').fontSize(this.appFontSize - 3).fontColor('#005DFF')
           }.width('92%').margin({ bottom: 15, top: 10 })
 
           this.CourseCard('10:00', '11:35', '高级人工智能', '信教 302 (数字多媒体教室)', '必修', '#EBF2FF', '#005DFF')
@@ -240,28 +256,31 @@ struct HomePageView {
   @Builder CourseCard(start: string, end: string, name: string, loc: string, tag: string, tagBg: string, tagColor: string) {
     Row() {
       Column() {
-        Text(start).fontSize(15).fontWeight(FontWeight.Medium)
-        Text(end).fontSize(12).fontColor('#CCC').margin({ top: 2 })
+        Text(start).fontSize(this.appFontSize - 1).fontWeight(FontWeight.Medium)
+          .fontColor(this.appTheme === 'dark' ? '#CCCCCC' : '#333333')
+        Text(end).fontSize(this.appFontSize - 4).fontColor(this.appTheme === 'dark' ? '#777777' : '#CCC').margin({ top: 2 })
       }.width('20%')
 
       Column({ space: 8 }) {
         Row() {
-          Text(name).fontSize(17).fontWeight(FontWeight.Bold).layoutWeight(1)
-          Text(tag).fontSize(11).fontColor(tagColor).backgroundColor(tagBg)
+          Text(name).fontSize(this.appFontSize + 1).fontWeight(FontWeight.Bold).layoutWeight(1)
+            .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1A1A1A')
+          Text(tag).fontSize(this.appFontSize - 5).fontColor(tagColor).backgroundColor(tagBg)
             .padding({ left: 8, right: 8, top: 2, bottom: 2 }).borderRadius(10)
         }.width('100%')
 
         Row() {
           Image($r('app.media.location')).width(12).height(12).margin({ right: 5 }).opacity(0.4)
-          Text(loc).fontSize(13).fontColor('#666').maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+          Text(loc).fontSize(this.appFontSize - 3).fontColor(this.appTheme === 'dark' ? '#999999' : '#666')
+            .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.width('100%')
       }.alignItems(HorizontalAlign.Start).layoutWeight(1).padding({ left: 10 })
     }
     .width('92%')
     .padding(20)
     .margin({ bottom: 12 })
-    .backgroundColor('#FFFFFF')
+    .backgroundColor(this.appTheme === 'dark' ? '#1E1E1E' : '#FFFFFF')
     .borderRadius(20)
-    .border({ width: 1, color: '#F0F0F0' })
+    .border({ width: 1, color: this.appTheme === 'dark' ? '#2C2C2C' : '#F0F0F0' })
   }
 }
