@@ -22,7 +22,7 @@ struct Index {
 
   // 🛠️ 深度绑定：双向全局状态机，拉动滑块或切换单选框时，全项目关联组件毫秒级重绘
   @StorageLink('appTheme') appTheme: string = 'light';       // 'light' 浅色 / 'dark' 深色
-  @StorageLink('appFontSize') appFontSize: number = 16;       // 14 ~ 24 像素范围
+  @StorageLink('appFontSize') appFontSize: number = 17;       // 14 ~ 24 像素范围
 
   async aboutToAppear() {
     // 1. 拦截盘查 Preferences 首次启动状态
@@ -35,7 +35,7 @@ struct Index {
     const savedTheme = await StorageManager.getInstance().getSetting('theme_mode', 'light');
     AppStorage.set('appTheme', savedTheme);
 
-    const savedFontSize = await StorageManager.getInstance().getSetting('font_size', '16');
+    const savedFontSize = await StorageManager.getInstance().getSetting('font_size', '17');
     AppStorage.set('appFontSize', Number(savedFontSize));
 
     // 3. 从 RelationalStore 读取数据库离线日程单列表
@@ -67,7 +67,7 @@ struct Index {
 
   // 切换字号 (KV Store)
   async toggleFontSize() {
-    this.appFontSize = this.appFontSize === 16 ? 20 : 16;
+    this.appFontSize = this.appFontSize === 17 ? 20 : 17;
     await StorageManager.getInstance().putSetting('font_size', this.appFontSize.toString());
   }
 
@@ -337,7 +337,7 @@ struct Index {
 @Component
 struct InteractionView {
   @StorageLink('appTheme') appTheme: string = 'light';
-  @StorageLink('appFontSize') appFontSize: number = 16;
+  @StorageLink('appFontSize') appFontSize: number = 17;
   @State activeSubTab: number = 0;
 
   build() {
@@ -484,7 +484,7 @@ struct InteractionView {
 @Component
 struct MarketView {
   @StorageLink('appTheme') appTheme: string = 'light';
-  @StorageLink('appFontSize') appFontSize: number = 16;
+  @StorageLink('appFontSize') appFontSize: number = 17;
   @State activeCat: number = 0;
 
   build() {

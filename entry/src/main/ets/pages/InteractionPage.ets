@@ -2,7 +2,7 @@
 @Component
 export struct InteractionPage {
   @StorageLink('appTheme') appTheme: string = 'light';
-  @StorageLink('appFontSize') appFontSize: number = 16;
+  @StorageLink('appFontSize') appFontSize: number = 17;
   private tags: string[] = ['#2026招生信息#', '#毕业设计课题#', '#食堂新品采样#'];
 
   build() {
@@ -29,10 +29,10 @@ export struct InteractionPage {
         Column({ space: 12 }) {
           // 3. 话题标签
           Row({ space: 8 }) {
-            ForEach(this.tags, (tag) => {
+            ForEach(this.tags, (tag: string) => {
               Text(tag).fontSize(this.appFontSize - 4).fontColor('#2F6BFA').padding({ left: 10, right: 10, top: 6, bottom: 6 })
                 .backgroundColor('#EBF2FF').borderRadius(15)
-            })
+            }, (tag: string) => tag)
           }.width('100%').padding({ left: 16 })
 
           // 4. 活动卡片复刻 (机器人协会)

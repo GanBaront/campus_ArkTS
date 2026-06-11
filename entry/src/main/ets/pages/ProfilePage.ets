@@ -13,7 +13,7 @@ export struct ProfilePage {
 
   // 🛠️ 核心修复：状态统一双向绑定到 AppStorage，冷启动默认值彻底设为 'light'（浅色模式）
   @StorageLink('appTheme') appTheme: string = 'light';
-  @StorageLink('appFontSize') appFontSize: number = 16;
+  @StorageLink('appFontSize') appFontSize: number = 17;
 
   private storage = StorageManager.getInstance();
 
@@ -23,7 +23,7 @@ export struct ProfilePage {
       const savedTheme = await this.storage.getSetting('theme_mode', 'light');
       AppStorage.set('appTheme', savedTheme);
 
-      const savedFontSize = await this.storage.getSetting('font_size', '16');
+      const savedFontSize = await this.storage.getSetting('font_size', '17');
       AppStorage.set('appFontSize', Number(savedFontSize));
     } catch (e) {
       console.error('读取 KV Store 偏好设置失败: ' + JSON.stringify(e));

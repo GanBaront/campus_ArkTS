@@ -3,8 +3,10 @@ import common from '@ohos.app.ability.common';
 import Want from '@ohos.app.ability.Want';
 import { ProfilePage } from './ProfilePage';
 
-// 【核心修改】：引入你单独编写的学习模块组件
+// 引入独立拆分的子模块组件
 import { StudyAssistantView } from './StudyAssistantPage';
+import { InteractionPage } from './InteractionPage';
+import { MarketPage } from './MarketPage';
 
 // 定义首页菜单的数据接口
 interface MenuDataItem {
@@ -25,7 +27,7 @@ struct MainEntry {
 
   // 响应全局深浅色主题与字号
   @StorageLink('appTheme') appTheme: string = 'light'
-  @StorageLink('appFontSize') appFontSize: number = 16
+  @StorageLink('appFontSize') appFontSize: number = 17
 
   /**
    * 自定义底部 Tab 构建器（主题响应式）
@@ -69,11 +71,11 @@ struct MainEntry {
           .tabBar(this.TabBuilder('学习', 1, $r('app.media.book')))
 
           // 2. 互动区
-          TabContent() { this.PlaceholderView('校园互动即将来临...') }
+          TabContent() { InteractionPage() }
           .tabBar(this.TabBuilder('互动', 2, $r('app.media.chat')))
 
           // 3. 集市区
-          TabContent() { this.PlaceholderView('校园集市筹备中...') }
+          TabContent() { MarketPage() }
           .tabBar(this.TabBuilder('集市', 3, $r('app.media.shop')))
 
           // 4. 我的（直接复用 ProfilePage 组件展示简略信息）
@@ -119,7 +121,7 @@ struct HomePageView {
 
   // 响应全局主题与字号
   @StorageProp('appTheme') appTheme: string = 'light';
-  @StorageProp('appFontSize') appFontSize: number = 16;
+  @StorageProp('appFontSize') appFontSize: number = 17;
 
   // 动态日期显示状态
   @State currentDayString: string = ''

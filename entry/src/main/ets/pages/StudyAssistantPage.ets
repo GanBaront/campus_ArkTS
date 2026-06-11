@@ -48,7 +48,7 @@ export struct StudyAssistantView {
 
   // 响应全局主题与字号
   @StorageProp('appTheme') appTheme: string = 'light'
-  @StorageProp('appFontSize') appFontSize: number = 16
+  @StorageProp('appFontSize') appFontSize: number = 17
 
   build() {
     Column() {
@@ -116,7 +116,7 @@ struct CourseScheduleTimelineModule {
 
   // 响应全局主题与字号
   @StorageProp('appTheme') appTheme: string = 'light'
-  @StorageProp('appFontSize') appFontSize: number = 16
+  @StorageProp('appFontSize') appFontSize: number = 17
 
   // 严格限定初始课表只绑定到【第一周】+【星期一】
   @State coursesList: CourseItem[] = [
@@ -793,7 +793,7 @@ struct ScoreQueryModule {
 
   // 响应全局主题与字号
   @StorageProp('appTheme') appTheme: string = 'light'
-  @StorageProp('appFontSize') appFontSize: number = 16
+  @StorageProp('appFontSize') appFontSize: number = 17
 
   build() {
     Column() {
@@ -829,7 +829,7 @@ struct PlaceholderModule {
 
   // 响应全局主题与字号
   @StorageProp('appTheme') appTheme: string = 'light'
-  @StorageProp('appFontSize') appFontSize: number = 16
+  @StorageProp('appFontSize') appFontSize: number = 17
 
   build() {
     Column() {

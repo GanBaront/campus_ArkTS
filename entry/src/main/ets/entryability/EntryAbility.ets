@@ -1,12 +1,12 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
-import { StorageManager } from '../utils/StorageManager'; // 1. 引入你封装的存储管理器
+import bundleManager from '@ohos.bundle.bundleManager';
+import { StorageManager } from '../utils/StorageManager';
 
 const DOMAIN = 0x0000;
 
 export default class EntryAbility extends UIAbility {
-  // 2. 将 onCreate 改为 async 异步函数，确保初始化完成后再向下执行
   async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
     try {
       this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
@@ -16,7 +16,6 @@ export default class EntryAbility extends UIAbility {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
 
     try {
-      // 3. 核心注入：在此处传入当前 Ability 的 context 句柄，一键启动三合一存储引擎
       await StorageManager.getInstance().init(this.context);
       hilog.info(DOMAIN, 'testTag', 'StorageManager 一键初始化成功');
     } catch (err) {
@@ -28,32 +27,43 @@ export default class EntryAbility extends UIAbility {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onDestroy');
   }
 
-  // 4. 将 onWindowStageCreate 改为 async 异步函数，以便使用 await 读取首选项
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 
-    let isFirstLaunch: boolean = true;
-
+    // 1. 获取当前 App 版本号
+    let currentVersion: string = '1.0.0';
     try {
-      // 5. 从 Preferences 中动态异步获取真实的首次启动标记
-      isFirstLaunch = await StorageManager.getInstance().checkIsFirstLaunch();
-      hilog.info(DOMAIN, 'testTag', '从沙箱成功盘查到 isFirstLaunch 标记为: %{public}s', String(isFirstLaunch));
+      const bundleInfo = await bundleManager.getBundleInfoForSelf(
+        bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT
+      );
+      currentVersion = bundleInfo.versionName;
+      hilog.info(DOMAIN, 'testTag', '当前 App 版本: %{public}s', currentVersion);
     } catch (err) {
-      hilog.error(DOMAIN, 'testTag', '读取首次启动标记异常，降级使用默认值 true. 原因: %{public}s', JSON.stringify(err));
+      hilog.warn(DOMAIN, 'testTag', '获取版本号失败，使用默认值 1.0.0');
     }
 
-    let targetPage: string = '';
+    // 2. 检测首次启动或版本更新
+    let shouldShowOnboarding: boolean = false;
+    try {
+      shouldShowOnboarding = await StorageManager.getInstance()
+        .checkIsFirstLaunchOrUpdate(currentVersion);
+      hilog.info(DOMAIN, 'testTag', '是否需要引导页: %{public}s', String(shouldShowOnboarding));
+    } catch (err) {
+      hilog.error(DOMAIN, 'testTag', '首次启动检测异常: %{public}s', JSON.stringify(err));
+    }
 
-    if (isFirstLaunch) {
-      // 场景 A：首次启动，加载起始页 Index.ets（包含你写的跳动圆点加载动画）
-      // 随后由 Index 页面内部逻辑处理欢迎弹窗、消除标记，并跳转至 Onboarding 引导页
-      targetPage = 'pages/Index';
+    // 3. 决定加载哪个页面
+    let targetPage: string;
+    if (shouldShowOnboarding) {
+      targetPage = 'pages/Onboarding';
+      // 立即标记完成，避免用户杀进程后重复展示引导页
+      await StorageManager.getInstance().markLaunchComplete(currentVersion);
+      hilog.info(DOMAIN, 'testTag', '首次启动/版本更新标记已落盘');
     } else {
-      // 场景 B：非首次启动，直接加载登录页，提升用户体验
       targetPage = 'pages/LoginPage';
     }
 
-    // 执行页面加载
+    // 4. 加载目标页面
     windowStage.loadContent(targetPage, (err) => {
       if (err.code) {
         hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));

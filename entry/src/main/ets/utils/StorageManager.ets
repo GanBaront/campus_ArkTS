@@ -103,6 +103,40 @@ export class StorageManager {
     await this.preferences.flush();
   }
 
+  /**
+   * 综合检测是否需要显示引导页（首次启动 或 App 版本更新）
+   * @param currentVersion 当前 App 版本号
+   * @returns true = 需要显示引导页
+   */
+  public async checkIsFirstLaunchOrUpdate(currentVersion: string): Promise<boolean> {
+    if (!this.preferences) return true;
+
+    // 1. 检查首次启动标记（默认 true）
+    const isFirst: boolean = await this.preferences.get('isFirstLaunch', true) as boolean;
+    if (isFirst) {
+      return true;
+    }
+
+    // 2. 检查版本号是否变化（App 更新后重新展示引导）
+    const savedVersion: string = await this.preferences.get('appVersion', '') as string;
+    if (savedVersion !== currentVersion) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * 标记启动流程已完成，保存首次标记和当前版本号
+   * @param currentVersion 当前 App 版本号
+   */
+  public async markLaunchComplete(currentVersion: string): Promise<void> {
+    if (!this.preferences) return;
+    await this.preferences.put('isFirstLaunch', false);
+    await this.preferences.put('appVersion', currentVersion);
+    await this.preferences.flush();
+  }
+
   // ========================================================
   // 模块 2：用户设置 (KV Store)
   // ========================================================
