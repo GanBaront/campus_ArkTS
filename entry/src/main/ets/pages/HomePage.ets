@@ -3,6 +3,9 @@ import common from '@ohos.app.ability.common';
 import Want from '@ohos.app.ability.Want';
 import { ProfilePage } from './ProfilePage';
 
+// 【核心修改】：引入你单独编写的学习模块组件
+import { StudyAssistantView } from './StudyAssistantPage';
+
 // 定义首页菜单的数据接口
 interface MenuDataItem {
   name: string;
@@ -54,8 +57,10 @@ struct MainEntry {
           }
           .tabBar(this.TabBuilder('首页', 0, $r('app.media.home')))
 
-          // 1. 学习区
-          TabContent() { this.PlaceholderView('学习资源正在建设中...') }
+          // 1. 学习区 —— 【核心修改】：直接挂载独立出来的学习助手模块组件
+          TabContent() {
+            StudyAssistantView()
+          }
           .tabBar(this.TabBuilder('学习', 1, $r('app.media.book')))
 
           // 2. 互动区
@@ -144,7 +149,6 @@ struct HomePageView {
         // 1. 顶部状态栏与用户信息
         Row() {
           Column() {
-            // 【核心修改点】：绑定计算出来的动态真实系统日期
             Text(this.currentDayString).fontSize(14).fontColor('#999')
             Text(`你好，${this.userName}`)
               .fontSize(24).fontWeight(FontWeight.Bold).margin({ top: 6 })
@@ -158,7 +162,7 @@ struct HomePageView {
             .onClick(() => {
               const context = getContext(this) as common.UIAbilityContext;
               let want: Want = {
-                bundleName: 'com.example.campus', // 【核心Bug修复】：修正为应用当前的实际包名
+                bundleName: 'com.example.campus',
                 abilityName: 'ProfileAbility',
                 parameters: {
                   userId: this.userId,
