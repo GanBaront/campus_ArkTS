@@ -22,7 +22,7 @@ struct RegisterPage {
     Column() {
       // 1. 返回按钮
       Row() {
-        Image($r('app.media.wechat'))
+        Image($r('app.media.back'))
           .width(24)
           .height(24)
           .onClick(() => {
@@ -38,7 +38,7 @@ struct RegisterPage {
           Text('注册新账号')
             .fontSize(30)
             .fontWeight(FontWeight.Bold)
-          Image($r('app.media.wechat'))
+          Image($r('app.media.star'))
             .width(24)
             .height(24)
             .margin({ left: 8 })
@@ -55,23 +55,23 @@ struct RegisterPage {
       // 3. 注册表单（支持滚动，防止小屏幕键盘弹起遮挡）
       Scroll() {
         Column({ space: 15 }) {
-          this.RegisterInput('真实姓名', '请输入您的真实姓名', $r('app.media.wechat'), (val) => {
+          this.RegisterInput('真实姓名', '请输入您的真实姓名', $r('app.media.user'), (val) => {
             this.userName = val.trim()
           })
 
-          this.RegisterInput('学号', '请输入您的校方学号', $r('app.media.wechat'), (val) => {
+          this.RegisterInput('学号', '请输入您的校方学号', $r('app.media.id'), (val) => {
             this.studentId = val.trim()
           })
 
-          this.RegisterInput('手机号', '请输入手机号', $r('app.media.wechat'), (val) => {
+          this.RegisterInput('手机号', '请输入手机号', $r('app.media.home'), (val) => {
             this.phoneNumber = val.trim()
           })
 
-          this.RegisterInput('设置密码', '请输入密码(不少于6位)', $r('app.media.wechat'), (val) => {
+          this.RegisterInput('设置密码', '请输入密码(不少于6位)', $r('app.media.privacy'), (val) => {
             this.password = val.trim()
           }, InputType.Password)
 
-          this.RegisterInput('确认密码', '请再次输入密码', $r('app.media.wechat'), (val) => {
+          this.RegisterInput('确认密码', '请再次输入密码', $r('app.media.privacy'), (val) => {
             this.confirmPassword = val.trim()
           }, InputType.Password)
         }

@@ -12,6 +12,7 @@
  */
 import common from '@ohos.app.ability.common';
 import Want from '@ohos.app.ability.Want';
+import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
 import dataPreferences from '@ohos.data.preferences';
 import { StorageManager } from '../utils/StorageManager';
@@ -46,7 +47,7 @@ export struct ProfilePage {
     Column() {
       // --- 顶部导航栏 ---
       Row() {
-        Image($r('app.media.wechat'))
+        Image($r('app.media.back'))
           .width(24)
           .height(24)
           .onClick(() => {
@@ -75,7 +76,7 @@ export struct ProfilePage {
       // --- 1. 用户信息头部 ---
       Row({ space: 20 }) {
         Stack({ alignContent: Alignment.BottomEnd }) {
-          Image($r('app.media.wechat'))
+          Image($r('app.media.avatar'))
             .width(85)
             .height(85)
             .borderRadius(42.5)
@@ -85,7 +86,7 @@ export struct ProfilePage {
               .fill('#005DFF')
               .border({ width: 2, color: this.appTheme === 'dark' ? '#1E1E1E' : Color.White })
 
-            Image($r('app.media.wechat'))
+            Image($r('app.media.camera'))
               .width(14)
               .height(14)
           }
@@ -105,7 +106,7 @@ export struct ProfilePage {
             .fontColor(this.appTheme === 'dark' ? '#AAAAAA' : '#999999')
 
           Row() {
-            Image($r('app.media.wechat')).width(14).height(14).margin({ right: 6 })
+            Image($r('app.media.id')).width(14).height(14).margin({ right: 6 })
             Text(`学号：${this.userId}`)
               .fontSize(this.appFontSize - 4) // 响应全局字号
               .fontColor('#005DFF')
@@ -135,11 +136,11 @@ export struct ProfilePage {
         Column({ space: 16 }) {
           // 学籍与基础数据卡片
           Column() {
-            this.MenuRow($r('app.media.wechat'), '学籍卡包')
+            this.MenuRow($r('app.media.user'), '学籍卡包')
             Divider().margin({ left: 50, right: 15 }).color(this.appTheme === 'dark' ? '#2C2C2C' : '#F7F8FA')
-            this.MenuRow($r('app.media.wechat'), '2026春季校历')
+            this.MenuRow($r('app.media.calendar'), '2026春季校历')
             Divider().margin({ left: 50, right: 15 }).color(this.appTheme === 'dark' ? '#2C2C2C' : '#F7F8FA')
-            this.MenuRow($r('app.media.wechat'), '我的成绩单')
+            this.MenuRow($r('app.media.report'), '我的成绩单')
           }
           .backgroundColor(this.appTheme === 'dark' ? '#1E1E1E' : Color.White)
           .borderRadius(20)
@@ -148,7 +149,7 @@ export struct ProfilePage {
           // ⚙️ 实验4 KV Store 要求：应用偏好设置卡片组
           Column({ space: 14 }) {
             Row() {
-              Image($r('app.media.wechat')).width(20).height(20).margin({ left: 18, right: 15 })
+              Image($r('app.media.setting')).width(20).height(20).margin({ left: 18, right: 15 })
               Text('应用偏好设置 (KV Store)')
                 .fontSize(this.appFontSize) // 动态响应全局字号
                 .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#333333')
@@ -236,11 +237,11 @@ export struct ProfilePage {
 
           // 系统基本设置卡片
           Column() {
-            this.MenuRow($r('app.media.wechat'), '隐私与安全')
+            this.MenuRow($r('app.media.privacy'), '隐私与安全')
             Divider().margin({ left: 50, right: 15 }).color(this.appTheme === 'dark' ? '#2C2C2C' : '#F7F8FA')
-            this.MenuRow($r('app.media.wechat'), '帮助与反馈')
+            this.MenuRow($r('app.media.help'), '帮助与反馈')
             Divider().margin({ left: 50, right: 15 }).color(this.appTheme === 'dark' ? '#2C2C2C' : '#F7F8FA')
-            this.MenuRow($r('app.media.wechat'), '通用设置')
+            this.MenuRow($r('app.media.setting'), '通用设置')
           }
           .backgroundColor(this.appTheme === 'dark' ? '#1E1E1E' : Color.White)
           .borderRadius(20)
@@ -249,10 +250,17 @@ export struct ProfilePage {
           // 调试工具卡片
           Column({ space: 12 }) {
             Row() {
-              Image($r('app.media.wechat')).width(20).height(20).margin({ right: 10 })
+              Image($r('app.media.setting')).width(20).height(20).margin({ right: 10 })
               Text('开发调试工具').fontSize(this.appFontSize - 2).fontWeight(FontWeight.Bold)
                 .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#333333')
             }.width('100%').margin({ top: 4, left: 4 })
+
+            Button('学生信息管理 (RelationalStore CRUD)')
+              .width('100%').height(42).fontSize(this.appFontSize - 3)
+              .backgroundColor('#EF4444')
+              .onClick(() => {
+                router.pushUrl({ url: 'pages/Index' });
+              })
 
             Button('重置首次启动标记 (调试用)')
               .width('100%').height(42).fontSize(this.appFontSize - 3)
@@ -334,7 +342,7 @@ export struct ProfilePage {
       Image(icon).width(20).height(20).margin({ left: 18, right: 15 })
       Text(title).fontSize(this.appFontSize).fontColor(this.appTheme === 'dark' ? '#FFF' : '#333').fontWeight(FontWeight.Medium)
       Blank()
-      Image($r('app.media.wechat'))
+      Image($r('app.media.right'))
         .width(14).height(14).margin({ right: 18 }).opacity(0.3)
     }
     .width('100%')

@@ -35,7 +35,7 @@ struct Onboarding {
         Column({ space: 20 }) {
           Stack() {
             Circle().width(240).height(240).fill('#F0F5FF')
-            Image($r('app.media.wechat')) // 书本位置
+            Image($r('app.media.book')) // 书本位置
               .width(120).height(120)
           }
           .margin({ top: 80 })

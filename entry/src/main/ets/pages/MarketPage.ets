@@ -26,14 +26,14 @@ export struct MarketPage {
   private categories: string[] = ['二手交易', '失物招领', '代取快递', '兼职信息'];
 
   @State products: ProductItem[] = [
-    { name: 'iPad Air 4 64G 考研神器', price: '2800', oldPrice: '4200', seller: '研三学姐', category: '二手交易', image: $r('app.media.wechat') },
-    { name: '高等数学 第七版 下册', price: '35', oldPrice: '', seller: '大二学霸', category: '二手交易', image: $r('app.media.wechat') },
-    { name: '吉他（入门级）没用过几次', price: '150', oldPrice: '', seller: '吉他社员', category: '二手交易', image: $r('app.media.wechat') },
-    { name: '人体工学椅 很舒服', price: '80', oldPrice: '', seller: '毕业生', category: '二手交易', image: $r('app.media.wechat') },
-    { name: '图书馆捡到校园卡一张', price: '0', oldPrice: '', seller: '热心同学', category: '失物招领', image: $r('app.media.wechat') },
-    { name: '黑色双肩包在食堂二楼', price: '0', oldPrice: '', seller: '管理员', category: '失物招领', image: $r('app.media.wechat') },
-    { name: '帮取中通快递 小件', price: '5', oldPrice: '', seller: '跑腿小哥', category: '代取快递', image: $r('app.media.wechat') },
-    { name: '周末家教兼职 高中数学', price: '200', oldPrice: '300', seller: '教育机构', category: '兼职信息', image: $r('app.media.wechat') },
+    { name: 'iPad Air 4 64G 考研神器', price: '2800', oldPrice: '4200', seller: '研三学姐', category: '二手交易', image: $r('app.media.ipad') },
+    { name: '高等数学 第七版 下册', price: '35', oldPrice: '', seller: '大二学霸', category: '二手交易', image: $r('app.media.math') },
+    { name: '吉他（入门级）没用过几次', price: '150', oldPrice: '', seller: '吉他社员', category: '二手交易', image: $r('app.media.guitar') },
+    { name: '人体工学椅 很舒服', price: '80', oldPrice: '', seller: '毕业生', category: '二手交易', image: $r('app.media.chair') },
+    { name: '图书馆捡到校园卡一张', price: '0', oldPrice: '', seller: '热心同学', category: '失物招领', image: $r('app.media.chair') },
+    { name: '黑色双肩包在食堂二楼', price: '0', oldPrice: '', seller: '管理员', category: '失物招领', image: $r('app.media.chair') },
+    { name: '帮取中通快递 小件', price: '5', oldPrice: '', seller: '跑腿小哥', category: '代取快递', image: $r('app.media.chair') },
+    { name: '周末家教兼职 高中数学', price: '200', oldPrice: '300', seller: '教育机构', category: '兼职信息', image: $r('app.media.chair') },
   ];
 
   // 当前分类下的展示列表
@@ -57,9 +57,9 @@ export struct MarketPage {
           .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1A1A1A')
         Blank()
         Row({ space: 15 }) {
-          Image($r('app.media.wechat')).width(24).height(24)
+          Image($r('app.media.cart')).width(24).height(24)
             .fillColor(this.appTheme === 'dark' ? '#CCCCCC' : '#333333')
-          Image($r('app.media.wechat')).width(24).height(24)
+          Image($r('app.media.add_blue')).width(24).height(24)
         }
       }.width('100%').padding(16)
 
@@ -80,7 +80,7 @@ export struct MarketPage {
       // 3. 搜索框
       Row() {
         Row({ space: 10 }) {
-          Image($r('app.media.wechat')).width(18).height(18)
+          Image($r('app.media.search')).width(18).height(18)
             .fillColor(this.appTheme === 'dark' ? '#888888' : '#999999')
           Text('搜索宝贝、关键词...')
             .fontSize(this.appFontSize - 2)
@@ -89,7 +89,7 @@ export struct MarketPage {
         .backgroundColor(this.appTheme === 'dark' ? '#2D2D35' : '#F3F4F6')
         .padding(10).borderRadius(10)
 
-        Image($r('app.media.wechat')).width(22).height(22).margin({ left: 15 })
+        Image($r('app.media.filter')).width(22).height(22).margin({ left: 15 })
           .fillColor(this.appTheme === 'dark' ? '#CCCCCC' : '#333333')
         Text('筛选')
           .fontSize(this.appFontSize - 2)
