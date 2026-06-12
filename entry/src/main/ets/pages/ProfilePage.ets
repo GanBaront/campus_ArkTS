@@ -12,7 +12,6 @@
  */
 import common from '@ohos.app.ability.common';
 import Want from '@ohos.app.ability.Want';
-import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
 import dataPreferences from '@ohos.data.preferences';
 import { StorageManager } from '../utils/StorageManager';
@@ -21,7 +20,7 @@ import { StorageManager } from '../utils/StorageManager';
 @Component
 export struct ProfilePage {
   // 实时响应全局状态机的用户信息
-  @StorageProp('userName') userName: string = '甘同学';
+  @StorageProp('userName') userName: string = '甘凯洋';
   @StorageProp('userId') userId: string = '2301130077';
 
   // 🛠️ 核心修复：状态统一双向绑定到 AppStorage，冷启动默认值彻底设为 'light'（浅色模式）
@@ -254,13 +253,6 @@ export struct ProfilePage {
               Text('开发调试工具').fontSize(this.appFontSize - 2).fontWeight(FontWeight.Bold)
                 .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#333333')
             }.width('100%').margin({ top: 4, left: 4 })
-
-            Button('学生信息管理 (RelationalStore CRUD)')
-              .width('100%').height(42).fontSize(this.appFontSize - 3)
-              .backgroundColor('#EF4444')
-              .onClick(() => {
-                router.pushUrl({ url: 'pages/Index' });
-              })
 
             Button('重置首次启动标记 (调试用)')
               .width('100%').height(42).fontSize(this.appFontSize - 3)

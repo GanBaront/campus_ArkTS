@@ -120,7 +120,7 @@ struct LoginPage {
     let pref = await dataPreferences.getPreferences(context, 'AppLaunchPreferences');
     let regAccount = await pref.get('reg_account', '') as string;
     let regPassword = await pref.get('reg_password', '') as string;
-    let regUserName = await pref.get('reg_userName', '新同学') as string;
+    let regUserName = await pref.get('reg_userName', '新用户') as string;
     let regStudentId = await pref.get('reg_studentId', this.accountInput) as string;
 
     let isAuthSuccess = false;

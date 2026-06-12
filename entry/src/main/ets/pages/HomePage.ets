@@ -137,7 +137,7 @@ struct HomePageView {
   @Prop pageStack: NavPathStack;
 
   // 消费来自 MainAbility 或 StartAbility 的全局状态
-  @StorageProp('userName') userName: string = '甘同学';
+  @StorageProp('userName') userName: string = '甘凯洋';
   @StorageProp('userId') userId: string = '2301130077';
 
   // 响应全局主题与字号
