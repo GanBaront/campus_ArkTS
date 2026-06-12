@@ -17,8 +17,8 @@ export struct InteractionPage {
         Text('互动社区').fontSize(this.appFontSize + 4).fontWeight(FontWeight.Bold)
         Blank()
         Row({ space: 15 }) {
-          Image($r('app.media.search')).width(22).height(22).fillColor(this.appTheme === 'dark' ? '#FFF' : '#333')
-          Image($r('app.media.edit')).width(22).height(22)
+          Image($r('app.media.wechat')).width(22).height(22).fillColor(this.appTheme === 'dark' ? '#FFF' : '#333')
+          Image($r('app.media.wechat')).width(22).height(22)
         }
       }.width('100%').padding(16)
 
@@ -65,7 +65,7 @@ export struct InteractionPage {
   @Builder EventCard() {
     Column({ space: 10 }) {
       Row({ space: 10 }) {
-        Image($r('app.media.avatar_club')).width(40).height(40).borderRadius(20)
+        Image($r('app.media.wechat')).width(40).height(40).borderRadius(20)
         Column() {
           Text('机器人协会 小王').fontSize(this.appFontSize - 2).fontWeight(FontWeight.Bold)
           Text('来自【社团展示】').fontSize(11).fontColor('#999')
@@ -98,7 +98,7 @@ export struct InteractionPage {
   @Builder NormalPost() {
     Column({ space: 10 }) {
       Row({ space: 10 }) {
-        Image($r('app.media.avatar_user')).width(40).height(40).borderRadius(20)
+        Image($r('app.media.wechat')).width(40).height(40).borderRadius(20)
         Text('匿名用户').fontSize(this.appFontSize - 2).fontWeight(FontWeight.Bold)
       }.width('100%')
       Text('真的很想吐槽一下，图书馆某些同学占座真的太夸张了，一占就是一天，人都不见，希望能管管。')
@@ -127,9 +127,9 @@ export struct InteractionPage {
 
   @Builder PostActions(like: string, comment: string) {
     Row({ space: 20 }) {
-      Row({ space: 5 }) { Image($r('app.media.like')).width(16).height(16); Text(like).fontSize(12).fontColor('#999') }
-      Row({ space: 5 }) { Image($r('app.media.comment')).width(16).height(16); Text(comment).fontSize(12).fontColor('#999') }
-      Image($r('app.media.share')).width(16).height(16)
+      Row({ space: 5 }) { Image($r('app.media.wechat')).width(16).height(16); Text(like).fontSize(12).fontColor('#999') }
+      Row({ space: 5 }) { Image($r('app.media.wechat')).width(16).height(16); Text(comment).fontSize(12).fontColor('#999') }
+      Image($r('app.media.wechat')).width(16).height(16)
     }.width('100%').margin({ top: 5 })
   }
 }

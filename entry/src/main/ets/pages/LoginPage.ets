@@ -33,7 +33,7 @@ struct LoginPage {
       Column({ space: 10 }) {
         Row() {
           Text('欢迎回来').fontSize(30).fontWeight(FontWeight.Bold)
-          Image($r('app.media.wave')).width(30).height(30).margin({ left: 10 })
+          Image($r('app.media.wechat')).width(30).height(30).margin({ left: 10 })
         }
         Text('请登录您的校通Plus账号').fontSize(16).fontColor('#999').margin({ top: 10 })
       }.alignItems(HorizontalAlign.Start).width('100%').padding({ top: 60, bottom: 40 })
@@ -43,7 +43,7 @@ struct LoginPage {
         Column({ space: 10 }) {
           Text('手机号 / 学号').fontSize(14).fontColor('#666')
           Row() {
-            Image($r('app.media.user')).width(20).height(20).opacity(0.5)
+            Image($r('app.media.wechat')).width(20).height(20).opacity(0.5)
             TextInput({ text: this.accountInput, placeholder: '请输入学号或手机号' })
               .backgroundColor(Color.Transparent)
               .layoutWeight(1)
@@ -56,7 +56,7 @@ struct LoginPage {
         Column({ space: 10 }) {
           Text('密码').fontSize(14).fontColor('#666')
           Row() {
-            Image($r('app.media.privacy')).width(20).height(20).opacity(0.5)
+            Image($r('app.media.wechat')).width(20).height(20).opacity(0.5)
             TextInput({ placeholder: '请输入密码' })
               .type(InputType.Password)
               .backgroundColor(Color.Transparent)
@@ -80,7 +80,7 @@ struct LoginPage {
       // 4. 社交登录快捷方式
       Row({ space: 30 }) {
         this.SocialIcon($r('app.media.wechat'))
-        this.SocialIcon($r('app.media.qq'))
+        this.SocialIcon($r('app.media.wechat'))
       }.margin({ top: 50 })
 
       Blank()

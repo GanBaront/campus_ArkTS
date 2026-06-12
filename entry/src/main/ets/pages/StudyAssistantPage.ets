@@ -344,11 +344,11 @@ struct CourseScheduleTimelineModule {
           Blank()
 
           // 三点（更多）图标
-          Image($r('app.media.more')).width(22).height(22).margin({ right: 16 })
+          Image($r('app.media.wechat')).width(22).height(22).margin({ right: 16 })
             .onClick(() => { this.openTopActionMenu() })
 
           // 【已修改】将原有 app.media.home 房子图标改为 app.media.add 加号图标
-          Image($r('app.media.add')).width(22).height(22)
+          Image($r('app.media.wechat')).width(22).height(22)
             .onClick(() => { this.openAddModal() })
         }
         .width('92%').margin({ top: 10, bottom: 8 })
@@ -628,7 +628,7 @@ struct CourseScheduleTimelineModule {
     Row() {
       Column({ space: 4 }) {
         Row({ space: 6 }) {
-          Image($r('app.media.room')).width(16).height(16)
+          Image($r('app.media.wechat')).width(16).height(16)
           Text('空教室快速查询').fontSize(this.appFontSize - 2).fontWeight(FontWeight.Bold)
             .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1F2937')
         }

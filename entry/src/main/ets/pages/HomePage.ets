@@ -83,25 +83,25 @@ struct MainEntry {
           TabContent() {
             HomePageView({ pageStack: this.pageStack })
           }
-          .tabBar(this.TabBuilder('首页', 0, $r('app.media.home')))
+          .tabBar(this.TabBuilder('首页', 0, $r('app.media.wechat')))
 
           // 1. 学习区 —— 【核心修改】：直接挂载独立出来的学习助手模块组件
           TabContent() {
             StudyAssistantView()
           }
-          .tabBar(this.TabBuilder('学习', 1, $r('app.media.book')))
+          .tabBar(this.TabBuilder('学习', 1, $r('app.media.wechat')))
 
           // 2. 互动区
           TabContent() { InteractionPage() }
-          .tabBar(this.TabBuilder('互动', 2, $r('app.media.chat')))
+          .tabBar(this.TabBuilder('互动', 2, $r('app.media.wechat')))
 
           // 3. 集市区
           TabContent() { MarketPage() }
-          .tabBar(this.TabBuilder('集市', 3, $r('app.media.shop')))
+          .tabBar(this.TabBuilder('集市', 3, $r('app.media.wechat')))
 
           // 4. 我的（直接复用 ProfilePage 组件展示简略信息）
           TabContent() { ProfilePage() }
-          .tabBar(this.TabBuilder('我的', 4, $r('app.media.user')))
+          .tabBar(this.TabBuilder('我的', 4, $r('app.media.wechat')))
         }
         .width('100%')
         .height('100%')
@@ -121,7 +121,7 @@ struct MainEntry {
 
   @Builder PlaceholderView(text: string) {
     Column() {
-      Image($r('app.media.more')).width(64).height(64).opacity(0.1).margin({ bottom: 10 })
+      Image($r('app.media.wechat')).width(64).height(64).opacity(0.1).margin({ bottom: 10 })
       Text(text).fontSize(this.appFontSize).fontColor(this.appTheme === 'dark' ? '#666666' : '#CCC')
     }
     .width('100%').height('100%').justifyContent(FlexAlign.Center)
@@ -149,14 +149,14 @@ struct HomePageView {
 
   // 首页功能金刚区数据
   private menuData: MenuDataItem[] = [
-    { name: '我的课表', icon: $r('app.media.calendar'), color: '#E8F0FF' },
-    { name: '食堂人流', icon: $r('app.media.food'), color: '#E8F5E9' },
-    { name: '空教室', icon: $r('app.media.room'), color: '#FFF3E0' },
-    { name: '校园集市', icon: $r('app.media.shop'), color: '#F3E5F5' },
-    { name: '校园卡', icon: $r('app.media.id'), color: '#E8EAF6' },
-    { name: '成绩查询', icon: $r('app.media.report'), color: '#FFEBEE' },
-    { name: '社团招新', icon: $r('app.media.group'), color: '#E0F2F1' },
-    { name: '更多服务', icon: $r('app.media.more'), color: '#F5F5F5' },
+    { name: '我的课表', icon: $r('app.media.wechat'), color: '#E8F0FF' },
+    { name: '食堂人流', icon: $r('app.media.wechat'), color: '#E8F5E9' },
+    { name: '空教室', icon: $r('app.media.wechat'), color: '#FFF3E0' },
+    { name: '校园集市', icon: $r('app.media.wechat'), color: '#F3E5F5' },
+    { name: '校园卡', icon: $r('app.media.wechat'), color: '#E8EAF6' },
+    { name: '成绩查询', icon: $r('app.media.wechat'), color: '#FFEBEE' },
+    { name: '社团招新', icon: $r('app.media.wechat'), color: '#E0F2F1' },
+    { name: '更多服务', icon: $r('app.media.wechat'), color: '#F5F5F5' },
   ]
 
   // 组件即将出现时，动态计算当前系统的真实日期
@@ -193,7 +193,7 @@ struct HomePageView {
           Blank()
 
           // 点击“铃铛”图标，触发跨 Ability 跳转到个人中心
-          Image($r('app.media.notification'))
+          Image($r('app.media.wechat'))
             .width(28).height(28)
             .onClick(() => {
               const context = getContext(this) as common.UIAbilityContext;
@@ -222,7 +222,7 @@ struct HomePageView {
 
         // 3. 动态 Banner
         Stack({ alignContent: Alignment.BottomStart }) {
-          Image($r('app.media.banner1'))
+          Image($r('app.media.wechat'))
             .width('100%').height(180).borderRadius(12).objectFit(ImageFit.Cover)
 
           Column() {
@@ -293,7 +293,7 @@ struct HomePageView {
         }.width('100%')
 
         Row() {
-          Image($r('app.media.location')).width(12).height(12).margin({ right: 5 }).opacity(0.4)
+          Image($r('app.media.wechat')).width(12).height(12).margin({ right: 5 }).opacity(0.4)
           Text(loc).fontSize(this.appFontSize - 3).fontColor(this.appTheme === 'dark' ? '#999999' : '#666')
             .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
         }.width('100%')
