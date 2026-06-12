@@ -9,6 +9,7 @@ import AbilityConstant from '@ohos.app.ability.AbilityConstant';
 import Want from '@ohos.app.ability.Want';
 import window from '@ohos.window';
 import hilog from '@ohos.hilog';
+import { StorageManager } from '../utils/StorageManager';
 
 const DOMAIN = 0x0000;
 
@@ -26,8 +27,14 @@ export default class MainAbility extends UIAbility {
     AppStorage.set('userName', userName || '甘凯洋');
   }
 
-  /** 加载主界面 — HomePage（首页/学习/互动/集市/我的 五 Tab 布局） */
-  onWindowStageCreate(windowStage: window.WindowStage): void {
+  /** 加载主界面前从 KV Store 恢复系统设置，确保首页即显示上次保存的主题/字号 */
+  async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
+    // 从 KV Store 恢复用户偏好设置，注入 AppStorage（解决冷启动首页未恢复设置问题）
+    const savedTheme = await StorageManager.getInstance().getSetting('theme_mode', 'light');
+    AppStorage.set('appTheme', savedTheme);
+    const savedFontSize = await StorageManager.getInstance().getSetting('font_size', '17');
+    AppStorage.set('appFontSize', Number(savedFontSize));
+
     windowStage.loadContent('pages/HomePage', (err) => {
       if (err.code) {
         hilog.error(DOMAIN, 'MainAbility', 'Failed to load content. Cause: %{public}s', JSON.stringify(err));
