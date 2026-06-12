@@ -154,7 +154,7 @@ struct LoginPage {
     // 校验全部闭环通过，开始投递到 MainAbility
     if (isAuthSuccess) {
       const context = getContext(this) as common.UIAbilityContext;
-      promptAction.showToast({ message: '验证成功，正在登录...', duration: 1500 });
+      promptAction.showToast({ message: `登录成功 姓名:${finalUserName} ID:${finalUserId}`, duration: 2000 });
 
       let loginWant: Want = {
         bundleName: 'com.example.campus',

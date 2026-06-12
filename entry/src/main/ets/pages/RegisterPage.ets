@@ -139,7 +139,7 @@ struct RegisterPage {
 
   /** 注册成功：持久化凭证到 Preferences（重启不丢失），跳转回 LoginPage */
   private async handleRegisterSuccess() {
-    promptAction.showToast({ message: '注册成功！已自动填充凭证', duration: 2000 });
+    promptAction.showToast({ message: `注册成功！姓名:${this.userName} 账号:${this.phoneNumber}`, duration: 3000 });
 
     // 持久化到 Preferences，确保 App 重启后可直接登录
     const context = getContext(this) as common.Context;

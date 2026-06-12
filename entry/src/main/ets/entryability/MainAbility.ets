@@ -22,6 +22,10 @@ export default class MainAbility extends UIAbility {
     let userId = want.parameters?.userId as string;
     let userName = want.parameters?.userName as string;
 
+    // [诊断] 确认 Want 参数传递是否正常
+    hilog.info(DOMAIN, 'MainAbility', 'Want参数 userId: %{public}s, userName: %{public}s',
+      userId || 'null', userName || 'null');
+
     // 注入 AppStorage，驱动全局 UI 更新（如首页用户名校验、个人中心展示）
     AppStorage.set('userId', userId || '2301130077');
     AppStorage.set('userName', userName || '甘凯洋');
