@@ -13,6 +13,7 @@
 import router from '@ohos.router';
 import common from '@ohos.app.ability.common';
 import Want from '@ohos.app.ability.Want';
+import dataPreferences from '@ohos.data.preferences';
 import { ProfilePage } from './ProfilePage';
 import { StorageManager } from '../utils/StorageManager';
 
@@ -42,8 +43,29 @@ struct MainEntry {
   @StorageLink('appTheme') appTheme: string = 'light'
   @StorageLink('appFontSize') appFontSize: number = 17
 
-  /** 组件创建时从 KV Store 恢复上次偏好设置，确保首页首帧即显示正确主题/字号 */
+  /**
+   * 组件创建时从持久化存储恢复所有状态。
+   * 组件生命周期 aboutToAppear 由 ArkUI 框架保证在 build() 前完成，
+   * 是恢复全局状态的最可靠时机（优于 Ability 生命周期）。
+   */
   async aboutToAppear(): Promise<void> {
+    // 1. 从应用级 Preferences 恢复登录用户信息
+    try {
+      const appCtx = (getContext(this) as common.UIAbilityContext).getApplicationContext();
+      let pref = await dataPreferences.getPreferences(appCtx, 'AppLaunchPreferences');
+      let savedName = await pref.get('current_userName', '') as string;
+      let savedId = await pref.get('current_userId', '') as string;
+      if (savedName) {
+        AppStorage.set('userName', savedName);
+      }
+      if (savedId) {
+        AppStorage.set('userId', savedId);
+      }
+    } catch (err) {
+      console.error('HomePage恢复用户信息失败: ' + JSON.stringify(err));
+    }
+
+    // 2. 从 KV Store 恢复偏好设置
     const savedTheme = await StorageManager.getInstance().getSetting('theme_mode', 'light');
     AppStorage.set('appTheme', savedTheme);
     const savedFontSize = await StorageManager.getInstance().getSetting('font_size', '17');
