@@ -1,7 +1,17 @@
+/**
+ * LoginPage — 登录页
+ * ===================
+ * 支持双链路认证：
+ *   1. 默认账号：2301130077 / 123456（测试用）
+ *   2. 注册账号：从 RegData 模块读取注册凭证校验
+ *
+ * 登录成功后通过 startAbility 拉起 MainAbility。
+ */
 import router from '@ohos.router';
 import common from '@ohos.app.ability.common';
 import Want from '@ohos.app.ability.Want';
 import promptAction from '@ohos.promptAction';
+import { RegData } from '../utils/RegData';
 
 @Entry
 @Component
@@ -9,6 +19,7 @@ struct LoginPage {
   @State accountInput: string = ''
   @State passwordInput: string = ''
 
+  /** 页面显示时从路由参数自动填充账号（如从注册页跳回） */
   onPageShow() {
     const params = router.getParams() as Record<string, string | boolean>;
     if (params && params.account) {
@@ -91,7 +102,8 @@ struct LoginPage {
   }
 
   /**
-   * 登录多维校验与精准路由拉起
+   * 登录校验与路由拉起
+   * 优先级：默认测试账号 → RegData 注册账号 → 拒绝
    */
   private async handleLogin() {
     if (!this.accountInput) {
@@ -103,17 +115,11 @@ struct LoginPage {
       return;
     }
 
-    // 从凭证池读取新注册的数据
-    let regAccount = AppStorage.get<string>('registered_account') || '';
-    let regPassword = AppStorage.get<string>('registered_password') || '';
-    let regUserName = AppStorage.get<string>('registered_userName') || '新同学';
-    let regStudentId = AppStorage.get<string>('registered_studentId') || this.accountInput;
-
     let isAuthSuccess = false;
     let finalUserName = '';
     let finalUserId = '';
 
-    // 进行账密多链路比对
+    // 链路 1：默认测试账号（学号 2301130077 / 密码 123456）
     if (this.accountInput === '2301130077') {
       if (this.passwordInput === '123456') {
         isAuthSuccess = true;
@@ -123,17 +129,17 @@ struct LoginPage {
         promptAction.showToast({ message: '默认账号密码错误，测试密码为 123456', duration: 2000 });
         return;
       }
-    } else if (regAccount && this.accountInput === regAccount) {
-      if (this.passwordInput === regPassword) {
+    } else if (RegData.hasData && this.accountInput === RegData.account) {
+      if (this.passwordInput === RegData.password) {
         isAuthSuccess = true;
-        finalUserName = regUserName;   // 绑定新注册的真实姓名
-        finalUserId = regStudentId;    // 绑定新注册的真实学号
+        finalUserName = RegData.userName;
+        finalUserId = RegData.studentId;
       } else {
         promptAction.showToast({ message: '登录密码与注册密码不一致！', duration: 2000 });
         return;
       }
     } else {
-      promptAction.showToast({ message: '该账号尚未注册，请先注册！', duration: 2000 });
+      promptAction.showToast({ message: `未注册: 输入[${this.accountInput}] 已注册[${RegData.account}]`, duration: 3000 });
       return;
     }
 

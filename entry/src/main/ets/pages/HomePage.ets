@@ -1,3 +1,15 @@
+/**
+ * HomePage — 主界面（五 Tab 底部导航）
+ * =====================================
+ * Tab 结构：
+ *   首页 (HomePageView) — 用户信息/金刚区/课程卡片
+ *   学习 (StudyAssistantView) — 课表/成绩查询
+ *   互动 (InteractionPage) — 社区帖子
+ *   集市 (MarketPage) — 二手交易
+ *   我的 (ProfilePage) — 个人中心/设置/调试
+ *
+ * 由 MainAbility 在登录成功后加载。
+ */
 import router from '@ohos.router';
 import common from '@ohos.app.ability.common';
 import Want from '@ohos.app.ability.Want';
@@ -8,7 +20,7 @@ import { StudyAssistantView } from './StudyAssistantPage';
 import { InteractionPage } from './InteractionPage';
 import { MarketPage } from './MarketPage';
 
-// 定义首页菜单的数据接口
+/** 金刚区菜单项数据结构 */
 interface MenuDataItem {
   name: string;
   icon: Resource;

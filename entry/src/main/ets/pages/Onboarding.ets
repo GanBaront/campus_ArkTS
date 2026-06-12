@@ -1,3 +1,9 @@
+/**
+ * Onboarding — 首次启动引导页
+ * ============================
+ * 三页轮播介绍 → 点击"立即开启"或"跳过介绍" → 跳转 LoginPage。
+ * 仅在首次启动或 App 版本更新后展示一次。
+ */
 import router from '@ohos.router';
 
 @Entry

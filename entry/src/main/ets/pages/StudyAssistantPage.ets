@@ -1,9 +1,21 @@
-// entry/src/main/ets/pages/StudyAssistantPage.ets
+/**
+ * StudyAssistantPage — 学习助手页面
+ * ===================================
+ * 包含四个子模块：
+ *   1. 课表（周视图 + 日视图双模式）
+ *   2. 空教室查询（占位）
+ *   3. 成绩查询
+ *   4. 考试安排（占位）
+ *
+ * 作为 HomePage「学习」Tab 嵌入使用。
+ */
 import promptAction from '@ohos.promptAction';
 
 // ==========================================
 // 1. 强类型核心数据模型定义
 // ==========================================
+
+/** 课程数据模型 — 支持周次过滤（每周/单周/双周/特定周） */
 interface CourseItem {
   id: string;            // 唯一标识
   name: string;          // 课程名称

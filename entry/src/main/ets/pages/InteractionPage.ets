@@ -1,4 +1,9 @@
-// entry/src/main/ets/pages/InteractionPage.ets
+/**
+ * InteractionPage — 互动社区页面
+ * ================================
+ * 展示校园社区内容：推荐帖、组队招募、活动预约卡片。
+ * 作为 HomePage「互动」Tab 嵌入使用。
+ */
 @Component
 export struct InteractionPage {
   @StorageLink('appTheme') appTheme: string = 'light';

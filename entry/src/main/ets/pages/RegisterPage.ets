@@ -1,12 +1,19 @@
+/**
+ * RegisterPage — 注册页
+ * ======================
+ * 校验字段：姓名、学号（≥5位）、手机号、密码（≥6位）、确认密码一致性。
+ * 注册成功后通过 RegData 静态类传递凭证，跳转回 LoginPage。
+ */
 import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
+import { RegData } from '../utils/RegData';
 
 @Entry
 @Component
 struct RegisterPage {
   @State phoneNumber: string = ''
-  @State userName: string = '' // 姓名状态
-  @State studentId: string = '' // 学号状态
+  @State userName: string = ''
+  @State studentId: string = ''
   @State password: string = ''
   @State confirmPassword: string = ''
 
@@ -102,7 +109,7 @@ struct RegisterPage {
     .backgroundColor('#FFFFFF')
   }
 
-  // 表单输入校验
+  /** 表单逐字段校验 */
   private handleRegisterValidation() {
     if (!this.userName) {
       promptAction.showToast({ message: '姓名不能为空！', duration: 2000 });
@@ -129,14 +136,12 @@ struct RegisterPage {
     this.handleRegisterSuccess()
   }
 
-  // 注册成功处理：利用 AppStorage 暂存多维凭证
+  /** 注册成功：通过 RegData 静态类暂存凭证，跳转回 LoginPage */
   private handleRegisterSuccess() {
     promptAction.showToast({ message: '注册成功！已自动填充凭证', duration: 2000 });
 
-    AppStorage.setOrCreate('registered_account', this.phoneNumber);
-    AppStorage.setOrCreate('registered_password', this.password);
-    AppStorage.setOrCreate('registered_userName', this.userName);
-    AppStorage.setOrCreate('registered_studentId', this.studentId);
+    // 用模块静态变量传递（不依赖 AppStorage / router params）
+    RegData.set(this.phoneNumber, this.password, this.userName, this.studentId);
 
     let options: router.RouterOptions = {
       url: 'pages/LoginPage',

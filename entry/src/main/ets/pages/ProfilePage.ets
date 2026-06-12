@@ -1,7 +1,20 @@
-// entry/src/main/ets/pages/ProfilePage.ets
+/**
+ * ProfilePage — 个人中心 / 设置页面
+ * ==================================
+ * 功能：
+ *   - 用户信息展示（头像/姓名/学号）
+ *   - 偏好设置（KV Store 主题切换 + 字号滑块）
+ *   - 系统设置菜单
+ *   - 开发调试工具（学生管理入口 + 首次启动标记重置）
+ *   - 退出登录
+ *
+ * 同时作为 HomePage「我的」Tab 组件和独立 Ability 页面使用。
+ */
 import common from '@ohos.app.ability.common';
 import Want from '@ohos.app.ability.Want';
+import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
+import dataPreferences from '@ohos.data.preferences';
 import { StorageManager } from '../utils/StorageManager';
 
 @Entry
@@ -234,6 +247,34 @@ export struct ProfilePage {
           .borderRadius(20)
           .shadow({ radius: 10, color: '#0A000000', offsetY: 4 })
 
+          // 调试工具卡片
+          Column({ space: 12 }) {
+            Row() {
+              Image($r('app.media.setting')).width(20).height(20).margin({ right: 10 })
+              Text('开发调试工具').fontSize(this.appFontSize - 2).fontWeight(FontWeight.Bold)
+                .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#333333')
+            }.width('100%').margin({ top: 4, left: 4 })
+
+            Button('学生信息管理 (RelationalStore CRUD)')
+              .width('100%').height(42).fontSize(this.appFontSize - 3)
+              .backgroundColor('#EF4444')
+              .onClick(() => {
+                router.pushUrl({ url: 'pages/Index' });
+              })
+
+            Button('重置首次启动标记 (调试用)')
+              .width('100%').height(42).fontSize(this.appFontSize - 3)
+              .backgroundColor('#6B7280')
+              .onClick(() => {
+                this.resetFirstLaunchFlag();
+              })
+          }
+          .padding(16)
+          .backgroundColor(this.appTheme === 'dark' ? '#1E1E1E' : Color.White)
+          .borderRadius(20)
+          .shadow({ radius: 10, color: '#0A000000', offsetY: 4 })
+          .margin({ bottom: 12 })
+
           // 4. 退出登录按钮
           Button('退出当前账号')
             .width('100%')
@@ -245,8 +286,8 @@ export struct ProfilePage {
             .borderRadius(20)
             .margin({ top: 10, bottom: 20 })
             .onClick(() => {
-              AppStorage.setOrCreate('userId', '2301130077');
-              AppStorage.setOrCreate('userName', '甘凯洋');
+              AppStorage.set('userId', '2301130077');
+              AppStorage.set('userName', '甘凯洋');
 
               const context = getContext(this) as common.UIAbilityContext;
               let logoutWant: Want = {
@@ -277,6 +318,16 @@ export struct ProfilePage {
     .width('100%')
     .height('100%')
     .backgroundColor(this.appTheme === 'dark' ? '#121212' : '#F7F8FA') // 顶层大底色联动响应
+  }
+
+  // 调试：重置首次启动标记
+  private async resetFirstLaunchFlag() {
+    const context = getContext(this) as common.Context;
+    let pref = await dataPreferences.getPreferences(context, 'AppLaunchPreferences');
+    await pref.put('isFirstLaunch', true);
+    await pref.delete('appVersion');
+    await pref.flush();
+    promptAction.showToast({ message: '已重置，冷启动复现引导页' });
   }
 
   @Builder StatItem(num: string, label: string) {

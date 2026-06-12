@@ -1,10 +1,21 @@
-// entry/src/main/ets/utils/StorageManager.ets
+/**
+ * StorageManager — 三引擎统一存储管理器
+ * ========================================
+ * 采用单例模式管理三大 HarmonyOS 持久化存储引擎：
+ *   1. Preferences   — 首次启动标记、版本号
+ *   2. KV Store      — 用户偏好设置（主题、字号）
+ *   3. RelationalStore — 学生信息 CRUD（事务、索引）
+ *
+ * 使用方式：
+ *   await StorageManager.getInstance().init(context);  // EntryAbility 中初始化
+ *   StorageManager.getInstance().insertStudent(...);   // 任意页面调用
+ */
 import dataPreferences from '@ohos.data.preferences';
 import distributedKVStore from '@ohos.data.distributedKVStore';
 import relativedb from '@ohos.data.relationalStore';
 import common from '@ohos.app.ability.common';
 
-// 严格对应实验报告要求的学生数据结构
+/** 学生数据结构 — 对应 student 表字段 */
 export interface StudentItem {
   id?: number;
   name: string;
@@ -13,7 +24,7 @@ export interface StudentItem {
   update_time: number;
 }
 
-// 🛠️ 精准修复：匹配主页 Index.ets 实际依赖的日程数据结构（将 location 修正为 content）
+/** 日程数据结构 — 匹配首页日程列表渲染 */
 export interface ScheduleItem {
   id?: number;
   title: string;

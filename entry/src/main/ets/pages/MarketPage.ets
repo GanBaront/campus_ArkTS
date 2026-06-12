@@ -1,5 +1,12 @@
-// entry/src/main/ets/pages/MarketPage.ets
+/**
+ * MarketPage — 校园集市页面
+ * ===========================
+ * 分类展示校园二手交易、失物招领、代取快递、兼职信息。
+ * 支持分类切换 + 双列网格布局。
+ * 作为 HomePage「集市」Tab 嵌入使用。
+ */
 
+/** 商品数据结构 */
 interface ProductItem {
   name: string;
   price: string;

@@ -1,4 +1,14 @@
-// entry/src/main/ets/pages/Index.ets
+/**
+ * Index — 学生信息管理独立页面
+ * ================================
+ * 包含完整的 RelationalStore CRUD 验证面板：
+ *   - 偏好设置舱（KV Store 主题/字号切换）
+ *   - 日程录入/展示（RelationalStore 写入/查询）
+ *   - 学生管理（新增/删除/改分/批量事务插入/索引搜索）
+ *
+ * 从 ProfilePage「我的」Tab →「学生信息管理」按钮跳转进入。
+ */
+import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
 import dataPreferences from '@ohos.data.preferences';
@@ -178,6 +188,17 @@ struct Index {
     promptAction.showToast({ message: this.queryTime });
   }
 
+  // 调试：重置首次启动标记
+  async resetFirstLaunch() {
+    const context = getContext(this) as common.Context;
+    let pref = await dataPreferences.getPreferences(context, 'AppLaunchPreferences');
+    await pref.put('isFirstLaunch', true);
+    await pref.delete('appVersion');
+    await pref.flush();
+    this.isFirstTime = true;
+    promptAction.showToast({ message: '已重置，冷启动复现引导页' });
+  }
+
   // 批量插入 100 条测试数据（验证事务加速）
   async batchInsert() {
     promptAction.showToast({ message: '正在事务批量写入 100 条数据...' });
@@ -197,10 +218,25 @@ struct Index {
           Column() {
             // 顶通标题导航栏
             Row() {
-              Text('综合数据工作台')
+              Button('← 返回')
+                .fontSize(12).height(28).backgroundColor('#6B7280')
+                .margin({ right: 8 })
+                .onClick(() => {
+                  router.back();
+                })
+              Text('学生信息管理')
                 .fontSize(this.appFontSize + 2)
                 .fontWeight(FontWeight.Bold)
                 .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1F2937')
+                .layoutWeight(1)
+              Button('DEBUG')
+                .fontSize(10)
+                .height(24)
+                .fontColor(Color.White)
+                .backgroundColor(Color.Red)
+                .onClick(() => {
+                  this.resetFirstLaunch();
+                })
             }
             .width('100%')
             .padding(16)
@@ -455,19 +491,6 @@ struct Index {
                 .borderRadius(12)
                 .backgroundColor(this.appTheme === 'dark' ? '#2D2D35' : '#FFFFFF')
 
-                // 调试工具
-                Button('重置首次启动状态标记(调试用)')
-                  .fontSize(this.appFontSize - 4)
-                  .backgroundColor('#6B7280')
-                  .width('100%')
-                  .onClick(async () => {
-                    const context = getContext(this) as common.Context;
-                    let pref = await dataPreferences.getPreferences(context, 'AppLaunchPreferences');
-                    await pref.put('is_first_launch', true);
-                    await pref.flush();
-                    this.isFirstTime = true;
-                    promptAction.showToast({ message: '已重置 Preferences 标记，请冷启动复现弹窗' });
-                  })
               }
               .padding(12)
             }
