@@ -219,6 +219,7 @@ export class StorageManager {
       this.rdbStore.commit();
       return new Date().getTime() - startTime;
     } catch (err) {
+      this.rdbStore.rollBack();
       throw new Error(JSON.stringify(err));
     }
   }

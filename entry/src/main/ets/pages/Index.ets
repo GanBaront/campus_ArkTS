@@ -2,7 +2,7 @@
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
 import dataPreferences from '@ohos.data.preferences';
-import { StorageManager, ScheduleItem } from '../utils/StorageManager';
+import { StorageManager, ScheduleItem, StudentItem } from '../utils/StorageManager';
 import { ProfilePage } from './ProfilePage';
 
 @Entry
@@ -19,6 +19,15 @@ struct Index {
   // 临时表单状态数据
   @State newTitle: string = '';
   @State newContent: string = '';
+
+  // 步骤4：学生信息管理状态变量
+  @State studentList: Array<StudentItem> = [];
+  @State newStudentName: string = '';
+  @State newStudentAge: string = '';
+  @State newStudentScore: string = '';
+  @State searchName: string = '';
+  @State batchInsertTime: string = '';   // 批量插入耗时展示
+  @State queryTime: string = '';         // 查询耗时展示
 
   // 🛠️ 深度绑定：双向全局状态机，拉动滑块或切换单选框时，全项目关联组件毫秒级重绘
   @StorageLink('appTheme') appTheme: string = 'light';       // 'light' 浅色 / 'dark' 深色
@@ -100,6 +109,82 @@ struct Index {
     await StorageManager.getInstance().deleteScheduleById(id);
     promptAction.showToast({ message: '已从数据库中安全擦除' });
     await this.refreshSchedules();
+  }
+
+  // ========================================================
+  // 步骤4：学生信息管理 CRUD（RelationalStore 优化验证）
+  // ========================================================
+
+  // 刷新学生列表
+  async refreshStudents() {
+    const start = Date.now();
+    this.studentList = await StorageManager.getInstance().queryAllStudents();
+    const elapsed = Date.now() - start;
+    if (this.studentList.length > 0) {
+      this.queryTime = `${elapsed}ms（共 ${this.studentList.length} 条）`;
+    }
+  }
+
+  // 新增学生
+  async addStudent() {
+    if (!this.newStudentName.trim()) {
+      promptAction.showToast({ message: '请输入学生姓名' });
+      return;
+    }
+    const age = parseInt(this.newStudentAge) || 20;
+    const score = parseFloat(this.newStudentScore) || 80;
+
+    const student: StudentItem = {
+      name: this.newStudentName.trim(),
+      age: age,
+      score: score,
+      update_time: Date.now()
+    };
+
+    const rowId = await StorageManager.getInstance().insertStudent(student);
+    promptAction.showToast({ message: `学生已入库，rowId=${rowId}` });
+
+    this.newStudentName = '';
+    this.newStudentAge = '';
+    this.newStudentScore = '';
+    await this.refreshStudents();
+  }
+
+  // 删除学生
+  async deleteStudent(id: number) {
+    const affected = await StorageManager.getInstance().deleteStudentById(id);
+    promptAction.showToast({ message: `已删除，影响行数=${affected}` });
+    await this.refreshStudents();
+  }
+
+  // 更新学生分数
+  async updateScore(id: number) {
+    const newScore = Math.floor(Math.random() * 41) + 60; // 60~100 随机分
+    const affected = await StorageManager.getInstance().updateStudentScore(id, newScore);
+    promptAction.showToast({ message: `分数已更新为 ${newScore}，影响行数=${affected}` });
+    await this.refreshStudents();
+  }
+
+  // 按姓名模糊搜索（验证索引加速）
+  async searchStudents() {
+    if (!this.searchName.trim()) {
+      await this.refreshStudents();
+      return;
+    }
+    const start = Date.now();
+    this.studentList = await StorageManager.getInstance().queryStudentsByName(this.searchName.trim());
+    const elapsed = Date.now() - start;
+    this.queryTime = `索引查询耗时: ${elapsed}ms（匹配 ${this.studentList.length} 条）`;
+    promptAction.showToast({ message: this.queryTime });
+  }
+
+  // 批量插入 100 条测试数据（验证事务加速）
+  async batchInsert() {
+    promptAction.showToast({ message: '正在事务批量写入 100 条数据...' });
+    const elapsed = await StorageManager.getInstance().batchInsertTestData();
+    this.batchInsertTime = `批量插入 100 条耗时: ${elapsed}ms（事务优化）`;
+    promptAction.showToast({ message: this.batchInsertTime });
+    await this.refreshStudents();
   }
 
   build() {
@@ -233,6 +318,137 @@ struct Index {
                       .borderRadius(8)
                       .backgroundColor(this.appTheme === 'dark' ? '#3E3E4A' : '#F9FAFB')
                     }, (item: ScheduleItem) => item.id!.toString())
+                  }
+                }
+                .padding(14)
+                .borderRadius(12)
+                .backgroundColor(this.appTheme === 'dark' ? '#2D2D35' : '#FFFFFF')
+
+                // ==============================================
+                // 步骤4：学生信息管理 (RelationalStore 优化验证)
+                // ==============================================
+                Column({ space: 10 }) {
+                  Text('学生信息管理 (RelationalStore CRUD)')
+                    .fontSize(this.appFontSize - 3)
+                    .fontWeight(FontWeight.Bold)
+                    .fontColor('#EF4444')
+                    .width('100%')
+
+                  // ---- 4.1 新增学生表单 ----
+                  Text('新增学生').fontSize(this.appFontSize - 4).fontColor('#9CA3AF').width('100%')
+                  Row({ space: 8 }) {
+                    TextInput({ text: this.newStudentName, placeholder: '姓名' })
+                      .placeholderColor('#9CA3AF')
+                      .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#000000')
+                      .backgroundColor(this.appTheme === 'dark' ? '#3E3E4A' : '#F3F4F6')
+                      .layoutWeight(2)
+                      .onChange((val) => this.newStudentName = val)
+                    TextInput({ text: this.newStudentAge, placeholder: '年龄' })
+                      .placeholderColor('#9CA3AF')
+                      .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#000000')
+                      .backgroundColor(this.appTheme === 'dark' ? '#3E3E4A' : '#F3F4F6')
+                      .layoutWeight(1)
+                      .onChange((val) => this.newStudentAge = val)
+                    TextInput({ text: this.newStudentScore, placeholder: '分数' })
+                      .placeholderColor('#9CA3AF')
+                      .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#000000')
+                      .backgroundColor(this.appTheme === 'dark' ? '#3E3E4A' : '#F3F4F6')
+                      .layoutWeight(1)
+                      .onChange((val) => this.newStudentScore = val)
+                  }.width('100%')
+
+                  Button('新增学生（异步写入）')
+                    .width('100%').height(36).fontSize(this.appFontSize - 3)
+                    .backgroundColor('#EF4444')
+                    .onClick(() => this.addStudent())
+
+                  // ---- 4.2 批量插入 + 搜索（优化验证）----
+                  Divider().margin({ top: 4, bottom: 4 }).color(this.appTheme === 'dark' ? '#3E3E4A' : '#E5E7EB')
+
+                  Row({ space: 8 }) {
+                    Button('批量插入100条测试数据')
+                      .fontSize(this.appFontSize - 4).height(34)
+                      .backgroundColor('#F59E0B')
+                      .layoutWeight(1)
+                      .onClick(() => this.batchInsert())
+                    Button('查询全部')
+                      .fontSize(this.appFontSize - 4).height(34)
+                      .backgroundColor('#10B981')
+                      .layoutWeight(1)
+                      .onClick(async () => {
+                        const start = Date.now();
+                        this.studentList = await StorageManager.getInstance().queryAllStudents();
+                        const elapsed = Date.now() - start;
+                        this.queryTime = `全表查询耗时: ${elapsed}ms（共 ${this.studentList.length} 条）`;
+                        promptAction.showToast({ message: this.queryTime });
+                      })
+                  }.width('100%')
+
+                  // 批量插入耗时展示
+                  if (this.batchInsertTime) {
+                    Text(this.batchInsertTime)
+                      .fontSize(this.appFontSize - 5).fontColor('#F59E0B')
+                      .fontWeight(FontWeight.Bold).width('100%')
+                  }
+
+                  // ---- 4.3 按姓名搜索（验证索引加速）----
+                  Row({ space: 8 }) {
+                    TextInput({ text: this.searchName, placeholder: '按姓名模糊搜索...' })
+                      .placeholderColor('#9CA3AF')
+                      .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#000000')
+                      .backgroundColor(this.appTheme === 'dark' ? '#3E3E4A' : '#F3F4F6')
+                      .layoutWeight(1)
+                      .onChange((val) => this.searchName = val)
+                    Button('索引搜索')
+                      .fontSize(this.appFontSize - 4).height(34)
+                      .backgroundColor('#8B5CF6')
+                      .onClick(() => this.searchStudents())
+                  }.width('100%')
+
+                  if (this.queryTime) {
+                    Text(this.queryTime)
+                      .fontSize(this.appFontSize - 5).fontColor('#8B5CF6')
+                      .fontWeight(FontWeight.Bold).width('100%')
+                  }
+
+                  // ---- 4.4 学生列表 ----
+                  Text(`学生列表（共 ${this.studentList.length} 条）`)
+                    .fontSize(this.appFontSize - 4).fontColor('#9CA3AF').width('100%')
+                    .margin({ top: 4 })
+
+                  if (this.studentList.length === 0) {
+                    Text('暂无数据，请先批量插入或手动新增')
+                      .fontSize(this.appFontSize - 4).fontColor('#6B7280')
+                      .margin({ top: 8, bottom: 8 })
+                  } else {
+                    Column({ space: 6 }) {
+                      ForEach(this.studentList, (item: StudentItem) => {
+                        Row() {
+                          Column({ space: 2 }) {
+                            Text(`${item.name}`)
+                              .fontSize(this.appFontSize - 2).fontWeight(FontWeight.Bold)
+                              .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1F2937')
+                            Row({ space: 8 }) {
+                              Text(`年龄: ${item.age}`).fontSize(this.appFontSize - 5).fontColor('#6B7280')
+                              Text(`分数: ${item.score}`).fontSize(this.appFontSize - 5).fontColor('#6B7280')
+                              Text(`ID: ${item.id}`).fontSize(this.appFontSize - 6).fontColor('#9CA3AF')
+                            }
+                          }.alignItems(HorizontalAlign.Start).layoutWeight(1)
+
+                          Button('改分')
+                            .fontSize(this.appFontSize - 6).height(22)
+                            .backgroundColor('#10B981')
+                            .onClick(() => this.updateScore(item.id!))
+                          Button('删除')
+                            .fontSize(this.appFontSize - 6).height(22)
+                            .backgroundColor('#EF4444')
+                            .margin({ left: 4 })
+                            .onClick(() => this.deleteStudent(item.id!))
+                        }
+                        .width('100%').padding(8).borderRadius(6)
+                        .backgroundColor(this.appTheme === 'dark' ? '#3E3E4A' : '#F9FAFB')
+                      }, (item: StudentItem) => `stu_${item.id}_${item.update_time}`)
+                    }.width('100%')
                   }
                 }
                 .padding(14)
