@@ -1,4 +1,4 @@
-# 校通Plus (Campus)
+# 校园通Plus (Campus)
 
 基于 **HarmonyOS ArkTS** 开发的校园综合助手应用，采用 Stage 模式 + ArkUI 声明式框架构建。
 

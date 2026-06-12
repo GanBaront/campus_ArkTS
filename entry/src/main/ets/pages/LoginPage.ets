@@ -3,7 +3,7 @@
  * ===================
  * 支持双链路认证：
  *   1. 默认账号：2301130077 / 123456（测试用）
- *   2. 注册账号：从 RegData 模块读取注册凭证校验
+ *   2. 注册账号：从 Preferences 持久化读取注册凭证校验
  *
  * 登录成功后通过 startAbility 拉起 MainAbility。
  */
@@ -11,7 +11,7 @@ import router from '@ohos.router';
 import common from '@ohos.app.ability.common';
 import Want from '@ohos.app.ability.Want';
 import promptAction from '@ohos.promptAction';
-import { RegData } from '../utils/RegData';
+import dataPreferences from '@ohos.data.preferences';
 
 @Entry
 @Component
@@ -103,7 +103,7 @@ struct LoginPage {
 
   /**
    * 登录校验与路由拉起
-   * 优先级：默认测试账号 → RegData 注册账号 → 拒绝
+   * 优先级：默认测试账号 → Preferences 持久化注册账号 → 拒绝
    */
   private async handleLogin() {
     if (!this.accountInput) {
@@ -114,6 +114,14 @@ struct LoginPage {
       promptAction.showToast({ message: '请输入密码！', duration: 2000 });
       return;
     }
+
+    // 从 Preferences 读取已持久化的注册凭证（重启不丢失）
+    const context = getContext(this) as common.Context;
+    let pref = await dataPreferences.getPreferences(context, 'AppLaunchPreferences');
+    let regAccount = await pref.get('reg_account', '') as string;
+    let regPassword = await pref.get('reg_password', '') as string;
+    let regUserName = await pref.get('reg_userName', '新同学') as string;
+    let regStudentId = await pref.get('reg_studentId', this.accountInput) as string;
 
     let isAuthSuccess = false;
     let finalUserName = '';
@@ -129,17 +137,17 @@ struct LoginPage {
         promptAction.showToast({ message: '默认账号密码错误，测试密码为 123456', duration: 2000 });
         return;
       }
-    } else if (RegData.hasData && this.accountInput === RegData.account) {
-      if (this.passwordInput === RegData.password) {
+    } else if (regAccount && this.accountInput === regAccount) {
+      if (this.passwordInput === regPassword) {
         isAuthSuccess = true;
-        finalUserName = RegData.userName;
-        finalUserId = RegData.studentId;
+        finalUserName = regUserName;
+        finalUserId = regStudentId;
       } else {
         promptAction.showToast({ message: '登录密码与注册密码不一致！', duration: 2000 });
         return;
       }
     } else {
-      promptAction.showToast({ message: `未注册: 输入[${this.accountInput}] 已注册[${RegData.account}]`, duration: 3000 });
+      promptAction.showToast({ message: `未注册: 输入[${this.accountInput}] 已注册[${regAccount}]`, duration: 3000 });
       return;
     }
 

@@ -6,7 +6,8 @@
  */
 import router from '@ohos.router';
 import promptAction from '@ohos.promptAction';
-import { RegData } from '../utils/RegData';
+import dataPreferences from '@ohos.data.preferences';
+import common from '@ohos.app.ability.common';
 
 @Entry
 @Component
@@ -136,12 +137,18 @@ struct RegisterPage {
     this.handleRegisterSuccess()
   }
 
-  /** 注册成功：通过 RegData 静态类暂存凭证，跳转回 LoginPage */
-  private handleRegisterSuccess() {
+  /** 注册成功：持久化凭证到 Preferences（重启不丢失），跳转回 LoginPage */
+  private async handleRegisterSuccess() {
     promptAction.showToast({ message: '注册成功！已自动填充凭证', duration: 2000 });
 
-    // 用模块静态变量传递（不依赖 AppStorage / router params）
-    RegData.set(this.phoneNumber, this.password, this.userName, this.studentId);
+    // 持久化到 Preferences，确保 App 重启后可直接登录
+    const context = getContext(this) as common.Context;
+    let pref = await dataPreferences.getPreferences(context, 'AppLaunchPreferences');
+    await pref.put('reg_account', this.phoneNumber);
+    await pref.put('reg_password', this.password);
+    await pref.put('reg_userName', this.userName);
+    await pref.put('reg_studentId', this.studentId);
+    await pref.flush();
 
     let options: router.RouterOptions = {
       url: 'pages/LoginPage',
