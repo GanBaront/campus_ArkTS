@@ -185,7 +185,7 @@ struct HomePageView {
         Row() {
           Column() {
             Text(this.currentDayString).fontSize(this.appFontSize - 2).fontColor(this.appTheme === 'dark' ? '#888888' : '#999')
-            Text(`你好，${this.userName}`)
+            Text(`你好，${this.userName}同学`)
               .fontSize(this.appFontSize + 8).fontWeight(FontWeight.Bold).margin({ top: 6 })
               .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1A1A1A')
           }.alignItems(HorizontalAlign.Start)
