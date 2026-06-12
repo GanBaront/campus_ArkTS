@@ -27,10 +27,10 @@ export default class MainAbility extends UIAbility {
 
   /** 加载页面前从 Preferences/KVStore 恢复所有持久化状态，确保首页首帧即显示正确信息 */
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
-    // 1. 从 Preferences 恢复当前登录用户信息
+    // 1. 从应用级 Preferences 恢复当前登录用户信息（跨 Ability 共享）
     try {
-      const context = this.context;
-      let pref = await dataPreferences.getPreferences(context, 'AppLaunchPreferences');
+      const appCtx = this.context.getApplicationContext();
+      let pref = await dataPreferences.getPreferences(appCtx, 'AppLaunchPreferences');
       let savedName = await pref.get('current_userName', '') as string;
       let savedId = await pref.get('current_userId', '') as string;
       if (savedName) {

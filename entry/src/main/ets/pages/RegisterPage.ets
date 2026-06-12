@@ -141,9 +141,9 @@ struct RegisterPage {
   private async handleRegisterSuccess() {
     promptAction.showToast({ message: `注册成功！姓名:${this.userName} 账号:${this.phoneNumber}`, duration: 3000 });
 
-    // 持久化到 Preferences，确保 App 重启后可直接登录
-    const context = getContext(this) as common.Context;
-    let pref = await dataPreferences.getPreferences(context, 'AppLaunchPreferences');
+    // 持久化到应用级 Preferences（跨 Ability 共享）
+    const appCtx = (getContext(this) as common.UIAbilityContext).getApplicationContext();
+    let pref = await dataPreferences.getPreferences(appCtx, 'AppLaunchPreferences');
     await pref.put('reg_account', this.phoneNumber);
     await pref.put('reg_password', this.password);
     await pref.put('reg_userName', this.userName);

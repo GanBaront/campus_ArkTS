@@ -115,9 +115,9 @@ struct LoginPage {
       return;
     }
 
-    // 从 Preferences 读取已持久化的注册凭证（重启不丢失）
-    const context = getContext(this) as common.Context;
-    let pref = await dataPreferences.getPreferences(context, 'AppLaunchPreferences');
+    // 从应用级 Preferences 读取已持久化的注册凭证（跨 Ability 共享）
+    const appCtx = (getContext(this) as common.UIAbilityContext).getApplicationContext();
+    let pref = await dataPreferences.getPreferences(appCtx, 'AppLaunchPreferences');
     let regAccount = await pref.get('reg_account', '') as string;
     let regPassword = await pref.get('reg_password', '') as string;
     let regUserName = await pref.get('reg_userName', '新用户') as string;
@@ -156,8 +156,9 @@ struct LoginPage {
       const context = getContext(this) as common.UIAbilityContext;
       promptAction.showToast({ message: `登录成功 姓名:${finalUserName} ID:${finalUserId}`, duration: 2000 });
 
-      // 持久化当前用户信息到 Preferences，供 MainAbility 启动时读取
-      let pref = await dataPreferences.getPreferences(context, 'AppLaunchPreferences');
+      // 持久化到应用级 Preferences（跨 Ability 共享）
+      const appCtx = context.getApplicationContext();
+      let pref = await dataPreferences.getPreferences(appCtx, 'AppLaunchPreferences');
       await pref.put('current_userName', finalUserName);
       await pref.put('current_userId', finalUserId);
       await pref.flush();
