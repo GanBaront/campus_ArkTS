@@ -14,6 +14,7 @@ import router from '@ohos.router';
 import common from '@ohos.app.ability.common';
 import Want from '@ohos.app.ability.Want';
 import { ProfilePage } from './ProfilePage';
+import { StorageManager } from '../utils/StorageManager';
 
 // 引入独立拆分的子模块组件
 import { StudyAssistantView } from './StudyAssistantPage';
@@ -40,6 +41,14 @@ struct MainEntry {
   // 响应全局深浅色主题与字号
   @StorageLink('appTheme') appTheme: string = 'light'
   @StorageLink('appFontSize') appFontSize: number = 17
+
+  /** 组件创建时从 KV Store 恢复上次偏好设置，确保首页首帧即显示正确主题/字号 */
+  async aboutToAppear(): Promise<void> {
+    const savedTheme = await StorageManager.getInstance().getSetting('theme_mode', 'light');
+    AppStorage.set('appTheme', savedTheme);
+    const savedFontSize = await StorageManager.getInstance().getSetting('font_size', '17');
+    AppStorage.set('appFontSize', Number(savedFontSize));
+  }
 
   /**
    * 自定义底部 Tab 构建器（主题响应式）
