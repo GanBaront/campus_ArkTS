@@ -9,7 +9,6 @@
  */
 import router from '@ohos.router';
 import common from '@ohos.app.ability.common';
-import Want from '@ohos.app.ability.Want';
 import promptAction from '@ohos.promptAction';
 import dataPreferences from '@ohos.data.preferences';
 
@@ -163,18 +162,9 @@ struct LoginPage {
       await pref.put('current_userId', finalUserId);
       await pref.flush();
 
-      let loginWant: Want = {
-        bundleName: 'com.example.campus',
-        abilityName: 'MainAbility',
-        parameters: {
-          'userId': finalUserId,
-          'userName': finalUserName
-        }
-      };
-
+      // 使用 router.replaceUrl 在同一 Ability 内跳转，避免多任务卡片
       try {
-        await context.startAbility(loginWant);
-        context.terminateSelf();
+        router.replaceUrl({ url: 'pages/HomePage' });
       } catch (err) {
         console.error('跳转失败原因: ' + JSON.stringify(err));
         promptAction.showToast({ message: '系统调度异常，请检查配置', duration: 2000 });

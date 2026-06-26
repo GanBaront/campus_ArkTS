@@ -20,7 +20,7 @@
         "startWindowIcon": "$media:startIcon",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
-        "launchType": "multiton",
+        "launchType": "singleton",
         "skills": [
           {
             "entities": [
