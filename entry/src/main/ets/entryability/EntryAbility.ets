@@ -14,6 +14,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import bundleManager from '@ohos.bundle.bundleManager';
 import { StorageManager } from '../utils/StorageManager';
+import { BackgroundTaskManager } from '../utils/BackgroundTaskManager';
 
 const DOMAIN = 0x0000;
 
@@ -34,6 +35,15 @@ export default class EntryAbility extends UIAbility {
       hilog.info(DOMAIN, 'testTag', 'StorageManager 一键初始化成功');
     } catch (err) {
       hilog.error(DOMAIN, 'testTag', 'StorageManager 初始化失败: %{public}s', JSON.stringify(err));
+    }
+
+    // 实验5：注册延迟任务（Wi-Fi + 充电 → 自动日志同步到 RelationalStore）
+    try {
+      const btm = BackgroundTaskManager.getInstance();
+      btm.registerDeferredTask({ needsCharging: true, needsWifi: true });
+      hilog.info(DOMAIN, 'testTag', '延迟任务已注册（日志同步）');
+    } catch (err) {
+      hilog.error(DOMAIN, 'testTag', '延迟任务注册失败: %{public}s', JSON.stringify(err));
     }
   }
 
@@ -98,5 +108,16 @@ export default class EntryAbility extends UIAbility {
 
   onBackground(): void {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
+    // 实验5：退后台时申请短时任务，保护草稿数据（draft_course_form / scroll_position）
+    try {
+      const btm = BackgroundTaskManager.getInstance();
+      const result = btm.requestTransientTask('保存草稿与滚动位置', () => {
+        console.info('EntryAbility 短时任务超时，强制落盘草稿数据');
+      });
+      hilog.info(DOMAIN, 'testTag', '短时任务已申请(requestId=%{public}d): %{public}s',
+        result.requestId, result.message);
+    } catch (err) {
+      hilog.error(DOMAIN, 'testTag', '短时任务申请失败: %{public}s', JSON.stringify(err));
+    }
   }
 }

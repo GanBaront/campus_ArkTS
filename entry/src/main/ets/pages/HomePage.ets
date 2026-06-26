@@ -107,7 +107,7 @@ struct MainEntry {
           }
           .tabBar(this.TabBuilder('首页', 0, $r('app.media.home')))
 
-          // 1. 学习区 —— 【核心修改】：直接挂载独立出来的学习助手模块组件
+          // 1. 学习区
           TabContent() {
             StudyAssistantView()
           }
@@ -121,7 +121,7 @@ struct MainEntry {
           TabContent() { MarketPage() }
           .tabBar(this.TabBuilder('集市', 3, $r('app.media.shop')))
 
-          // 4. 我的（直接复用 ProfilePage 组件展示简略信息）
+          // 4. 我的
           TabContent() { ProfilePage() }
           .tabBar(this.TabBuilder('我的', 4, $r('app.media.user')))
         }

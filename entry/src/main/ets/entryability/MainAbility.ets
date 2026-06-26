@@ -11,6 +11,7 @@ import window from '@ohos.window';
 import hilog from '@ohos.hilog';
 import dataPreferences from '@ohos.data.preferences';
 import { StorageManager } from '../utils/StorageManager';
+import { BackgroundTaskManager } from '../utils/BackgroundTaskManager';
 
 const DOMAIN = 0x0000;
 
@@ -62,6 +63,19 @@ export default class MainAbility extends UIAbility {
 
   onWindowStageDestroy(): void {}
   onForeground(): void {}
-  onBackground(): void {}
+  onBackground(): void {
+    // 实验5：退后台时申请短时任务，保护课表编辑草稿（draft_course_form）和滚动位置（scroll_position）
+    try {
+      const btm = BackgroundTaskManager.getInstance();
+      const result = btm.requestTransientTask('保存课表草稿与滚动位置', () => {
+        // 超时回调：3分钟内强制落盘，确保草稿不丢失
+        console.info('MainAbility 短时任务超时，紧急保护草稿数据（draft_course_form / scroll_position）');
+      });
+      hilog.info(DOMAIN, 'MainAbility', '短时任务已申请(requestId=%{public}d): %{public}s',
+        result.requestId, result.message);
+    } catch (err) {
+      hilog.error(DOMAIN, 'MainAbility', '短时任务申请失败: %{public}s', JSON.stringify(err));
+    }
+  }
   onDestroy(): void {}
 }

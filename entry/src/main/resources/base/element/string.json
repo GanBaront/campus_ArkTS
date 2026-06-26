@@ -11,6 +11,18 @@
     {
       "name": "EntryAbility_label",
       "value": "label"
+    },
+    {
+      "name": "publish_agent_reminder_reason",
+      "value": "用于设置倒计时提醒，即使应用关闭也能准时通知"
+    },
+    {
+      "name": "keep_background_running_reason",
+      "value": "用于后台音乐播放，防止进程被系统挂起"
+    },
+    {
+      "name": "internet_reason",
+      "value": "用于延迟任务网络状态检测与数据同步"
     }
   ]
 }

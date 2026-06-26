@@ -8,8 +8,28 @@
  *   4. 考试安排（占位）
  *
  * 作为 HomePage「学习」Tab 嵌入使用。
+ *
+ * 实验5 集成：退后台时短时任务自动保护课表编辑草稿，再次进入恢复。
  */
 import promptAction from '@ohos.promptAction';
+import dataPreferences from '@ohos.data.preferences';
+import common from '@ohos.app.ability.common';
+
+// ==========================================
+// 0. 实验5：课表编辑草稿数据结构（短时任务保护）
+// ==========================================
+interface CourseDraft {
+  formName: string;
+  formTeacher: string;
+  formLocation: string;
+  formCredit: string;
+  formDayOfWeek: number;
+  formSectionStart: number;
+  formWeekType: string;
+  formSpecificWeek: number;
+  isEditingMode: boolean;
+  targetEditingId: string;
+}
 
 // ==========================================
 // 1. 强类型核心数据模型定义
@@ -172,6 +192,72 @@ struct CourseScheduleTimelineModule {
     }
     for (let j = 0; j < 35; j++) {
       this.gridMatrixIndices.push(j);
+    }
+    // 实验5：尝试恢复未完成的课表编辑草稿（短时任务保护的数据）
+    this.loadFormDraft();
+  }
+
+  // 实验5：实时保存课表编辑草稿到 Preferences（退后台短时任务保护）
+  private async saveFormDraft(): Promise<void> {
+    try {
+      const ctx = getContext(this) as common.UIAbilityContext;
+      const pref = await dataPreferences.getPreferences(ctx.getApplicationContext(), 'AppLaunchPreferences');
+      const draft: CourseDraft = {
+        formName: this.formName,
+        formTeacher: this.formTeacher,
+        formLocation: this.formLocation,
+        formCredit: this.formCredit,
+        formDayOfWeek: this.formDayOfWeek,
+        formSectionStart: this.formSectionStart,
+        formWeekType: this.formWeekType,
+        formSpecificWeek: this.formSpecificWeek,
+        isEditingMode: this.isEditingMode,
+        targetEditingId: this.targetEditingId
+      };
+      await pref.put('draft_course_form', JSON.stringify(draft));
+      await pref.flush();
+    } catch (e) {
+      console.error('课表草稿保存失败: ' + JSON.stringify(e));
+    }
+  }
+
+  // 实验5：从 Preferences 恢复未完成的课表编辑草稿
+  private async loadFormDraft(): Promise<void> {
+    try {
+      const ctx = getContext(this) as common.UIAbilityContext;
+      const pref = await dataPreferences.getPreferences(ctx.getApplicationContext(), 'AppLaunchPreferences');
+      const raw = await pref.get('draft_course_form', '') as string;
+      if (raw) {
+        const draft: CourseDraft = JSON.parse(raw) as CourseDraft;
+        // 恢复表单字段
+        this.formName = draft.formName || '';
+        this.formTeacher = draft.formTeacher || '';
+        this.formLocation = draft.formLocation || '';
+        this.formCredit = draft.formCredit || '2';
+        this.formDayOfWeek = draft.formDayOfWeek || 1;
+        this.formSectionStart = draft.formSectionStart || 1;
+        this.formWeekType = draft.formWeekType || '每周';
+        this.formSpecificWeek = draft.formSpecificWeek || 1;
+        this.isEditingMode = draft.isEditingMode || false;
+        this.targetEditingId = draft.targetEditingId || '';
+        // 打开表单让用户继续编辑
+        this.isShowFormModal = true;
+        promptAction.showToast({ message: '已恢复未完成的课表草稿' });
+      }
+    } catch (e) {
+      console.error('课表草稿恢复失败: ' + JSON.stringify(e));
+    }
+  }
+
+  // 实验5：清除已保存的课表草稿（提交或取消后）
+  private async clearFormDraft(): Promise<void> {
+    try {
+      const ctx = getContext(this) as common.UIAbilityContext;
+      const pref = await dataPreferences.getPreferences(ctx.getApplicationContext(), 'AppLaunchPreferences');
+      await pref.delete('draft_course_form');
+      await pref.flush();
+    } catch (e) {
+      console.error('课表草稿清除失败: ' + JSON.stringify(e));
     }
   }
 
@@ -661,24 +747,24 @@ struct CourseScheduleTimelineModule {
           .fontColor(this.appTheme === 'dark' ? '#FFFFFF' : '#1F2937')
 
         TextInput({ text: this.formName, placeholder: '请输入课程名称（必填）' })
-          .height(42).onChange(v => { this.formName = v })
+          .height(42).onChange(v => { this.formName = v; this.saveFormDraft(); })
 
         TextInput({ text: this.formTeacher, placeholder: '请输入授课教师姓名' })
-          .height(42).onChange(v => { this.formTeacher = v })
+          .height(42).onChange(v => { this.formTeacher = v; this.saveFormDraft(); })
 
         TextInput({ text: this.formLocation, placeholder: '请输入上课具体教室（如信教302）' })
-          .height(42).onChange(v => { this.formLocation = v })
+          .height(42).onChange(v => { this.formLocation = v; this.saveFormDraft(); })
 
         TextInput({ text: this.formCredit, placeholder: '对应分配学分' })
-          .type(InputType.Number).height(42).onChange(v => { this.formCredit = v })
+          .type(InputType.Number).height(42).onChange(v => { this.formCredit = v; this.saveFormDraft(); })
 
         Row() {
           Text('上课星期:').fontSize(this.appFontSize - 2).fontColor('#4B5563')
           Counter() {
             Text(`周 ${['一','二','三','四','五','六','日'][this.formDayOfWeek - 1]}`).fontSize(this.appFontSize - 3).fontWeight(FontWeight.Bold)
           }
-          .onInc(() => { if (this.formDayOfWeek < 7) this.formDayOfWeek++ })
-          .onDec(() => { if (this.formDayOfWeek > 1) this.formDayOfWeek-- })
+          .onInc(() => { if (this.formDayOfWeek < 7) { this.formDayOfWeek++; this.saveFormDraft(); } })
+          .onDec(() => { if (this.formDayOfWeek > 1) { this.formDayOfWeek--; this.saveFormDraft(); } })
         }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 
         Row() {
@@ -686,8 +772,8 @@ struct CourseScheduleTimelineModule {
           Counter() {
             Text(`时段 ${this.formSectionStart}`).fontSize(this.appFontSize - 3).fontWeight(FontWeight.Bold)
           }
-          .onInc(() => { if (this.formSectionStart < 5) this.formSectionStart++ })
-          .onDec(() => { if (this.formSectionStart > 1) this.formSectionStart-- })
+          .onInc(() => { if (this.formSectionStart < 5) { this.formSectionStart++; this.saveFormDraft(); } })
+          .onDec(() => { if (this.formSectionStart > 1) { this.formSectionStart--; this.saveFormDraft(); } })
         }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 
         Column({ space: 8 }) {
@@ -701,7 +787,7 @@ struct CourseScheduleTimelineModule {
               .layoutWeight(1)
               .height(40)
               .onSelect((idx: number, value?: string) => {
-                if (value) { this.formWeekType = value }
+                if (value) { this.formWeekType = value; this.saveFormDraft(); }
               })
 
             if (this.formWeekType === '特定周') {
@@ -712,7 +798,8 @@ struct CourseScheduleTimelineModule {
                 .layoutWeight(1)
                 .height(40)
                 .onSelect((idx: number) => {
-                  this.formSpecificWeek = idx + 1
+                  this.formSpecificWeek = idx + 1;
+                  this.saveFormDraft();
                 })
             }
           }
@@ -722,7 +809,7 @@ struct CourseScheduleTimelineModule {
 
         Row({ space: 16 }) {
           Button('取消').layoutWeight(1).backgroundColor('#F3F4F6').fontColor('#4B5563')
-            .onClick(() => { this.isShowFormModal = false })
+            .onClick(() => { this.clearFormDraft(); this.isShowFormModal = false })
 
           Button('写入课表数据库').layoutWeight(1).backgroundColor('#2F6BFA')
             .onClick(() => {
@@ -781,6 +868,7 @@ struct CourseScheduleTimelineModule {
                 });
                 this.coursesList = updatedList;
               }
+              this.clearFormDraft();  // 实验5：保存成功后清除草稿
               this.isShowFormModal = false
             })
         }.margin({ top: 10 })
